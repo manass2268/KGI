@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Krishna Group of Institutions | Excellence in Education</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. GLOBAL VARIABLES --- */
+        :root {
+            --primary: #002147; /* KGI Deep Navy */
+            --secondary: #ff9900; /* KGI Orange */
+            --dark: #1a1a1a;
+            --white: #ffffff;
+            --light-bg: #f4f7f6;
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--light-bg); overflow-x: hidden; color: var(--dark); position: relative; }
+        a { text-decoration: none; transition: 0.3s; }
+        ul { list-style: none; }
+        html { scroll-behavior: smooth; }
+
+        /* --- 2. TOP BAR --- */
+        .top-bar {
+            background: var(--primary);
+            color: var(--white);
+            padding: 8px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            border-bottom: 3px solid var(--secondary);
+        }
+        .contact-info i { color: var(--secondary); margin-right: 6px; }
+        .contact-info span { margin-right: 20px; }
+        .social-media a { color: var(--white); margin-left: 15px; font-size: 0.9rem; }
+        .social-media a:hover { color: var(--secondary); }
+
+        /* --- 3. NAVBAR --- */
+        header {
+            background: var(--white);
+            padding: 0 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 80px;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo i { font-size: 2.5rem; color: var(--primary); }
+        .logo-text h1 { font-size: 1.8rem; font-weight: 800; color: var(--primary); line-height: 1; margin: 0; }
+        .logo-text p { font-size: 0.7rem; font-weight: 700; color: var(--secondary); letter-spacing: 2px; margin: 0; }
+
+        .nav-menu { display: flex; align-items: center; height: 100%; }
+        .nav-item { position: relative; height: 80px; display: flex; align-items: center; margin-left: 25px; cursor: pointer; }
+        
+        .nav-link { 
+            color: var(--dark); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; 
+            padding: 10px 0; display: flex; align-items: center; gap: 5px;
+        }
+        .nav-link i { font-size: 0.7rem; color: #888; transition: 0.3s; }
+        
+        .nav-item:hover .nav-link { color: var(--secondary); }
+        .nav-item:hover .nav-link i { transform: rotate(180deg); color: var(--secondary); }
+
+        /* --- DROPDOWNS --- */
+        .dropdown {
+            position: absolute; top: 80px; left: -20px;
+            background: var(--white); width: 240px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            border-top: 4px solid var(--secondary);
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            transition: all 0.3s ease; z-index: 999;
+        }
+        .nav-item:hover .dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+        .dropdown li { border-bottom: 1px solid #f1f1f1; position: relative; }
+        .dropdown a { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; color: #555; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
+        .dropdown a:hover { background: #fff8e1; color: var(--primary); padding-left: 25px; }
+
+        .dropdown-sub {
+            position: absolute; left: 100%; top: 0; background: var(--white); width: 250px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-left: 4px solid var(--secondary);
+            opacity: 0; visibility: hidden; transform: translateX(20px); transition: all 0.3s ease;
+        }
+        .dropdown li:hover > .dropdown-sub { opacity: 1; visibility: visible; transform: translateX(0); }
+
+        /* ERP Button */
+        .btn-erp {
+            background: linear-gradient(45deg, var(--primary), #003366);
+            color: var(--white) !important; padding: 10px 25px;
+            border-radius: 50px; font-size: 0.85rem; font-weight: 700;
+            margin-left: 30px; box-shadow: 0 4px 10px rgba(0, 33, 71, 0.3); text-transform: uppercase;
+        }
+        .btn-erp:hover { background: var(--secondary); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(255, 153, 0, 0.4); }
+
+        /* --- HERO --- */
+        .hero {
+            height: 85vh;
+            background: linear-gradient(rgba(0, 33, 71, 0.7), rgba(0, 33, 71, 0.5)), url('intitue1.jpeg');
+            background-size: cover; background-position: center; background-attachment: fixed;
+            display: flex; align-items: center; justify-content: center; text-align: center; color: var(--white);
+        }
+        .hero h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        .hero p { font-size: 1.2rem; margin-bottom: 30px; opacity: 0.9; }
+        .hero-badge { background: var(--secondary); padding: 5px 15px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; text-transform: uppercase; display: inline-block; margin-bottom: 20px; }
+        .hero-btns { display: flex; justify-content: center; gap: 20px; }
+        .btn-main { padding: 15px 40px; background: var(--secondary); color: var(--white); font-weight: bold; border-radius: 5px; border: 2px solid var(--secondary); }
+        .btn-main:hover { background: transparent; color: var(--white); }
+        .btn-outline { padding: 15px 40px; background: transparent; color: var(--white); font-weight: bold; border-radius: 5px; border: 2px solid var(--white); }
+        .btn-outline:hover { background: var(--white); color: var(--primary); }
+
+        /* News Ticker */
+        .news-ticker { background: var(--primary); color: var(--white); display: flex; height: 40px; }
+        .ticker-title { background: var(--secondary); padding: 0 30px; font-weight: 700; text-transform: uppercase; font-size: 0.85rem; display: flex; align-items: center; z-index: 2; }
+        .ticker-content { flex: 1; overflow: hidden; white-space: nowrap; display: flex; align-items: center; }
+        .ticker-content marquee { font-size: 0.9rem; font-weight: 500; letter-spacing: 0.5px; }
+
+        /* Stats & Courses */
+        .section-tag { color: var(--secondary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; display: block; text-align: center; margin-bottom: 5px; }
+        .section-title { font-size: 2.5rem; color: var(--primary); font-weight: 800; margin-bottom: 50px; }
+        
+        .courses-section { padding: 80px 5%; background: var(--light-bg); }
+        .courses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-top: 40px; }
+        .course-card { background: var(--white); padding: 35px; border-radius: 10px; box-shadow: var(--shadow); transition: 0.4s; border-bottom: 4px solid transparent; }
+        .course-card:hover { transform: translateY(-10px); border-bottom-color: var(--secondary); }
+        .course-icon { width: 60px; height: 60px; background: rgba(0, 33, 71, 0.05); color: var(--primary); display: flex; justify-content: center; align-items: center; border-radius: 50%; font-size: 1.8rem; margin-bottom: 20px; transition: 0.3s; }
+        .course-card:hover .course-icon { background: var(--secondary); color: var(--white); }
+        .course-card h3 { font-size: 1.4rem; color: var(--primary); margin-bottom: 15px; font-weight: 700; }
+        .read-more { color: var(--secondary); font-weight: 700; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; }
+
+        /* --- AFFILIATIONS SECTION (NEW) --- */
+        .affil-section { padding: 80px 5%; background: var(--white); text-align: center; }
+        .affil-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 30px; }
+        .affil-card { background: var(--light-bg); border: 1px solid #eee; padding: 30px; border-radius: 10px; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .affil-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); border-bottom: 4px solid var(--secondary); }
+        .affil-icon { font-size: 3rem; color: var(--primary); margin-bottom: 15px; }
+        .affil-card h3 { font-size: 1.2rem; color: var(--primary); font-weight: 700; margin-bottom: 5px; }
+        .click-hint { font-size: 0.7rem; color: var(--secondary); font-weight: bold; margin-top: 10px; opacity: 0; transition: 0.3s; }
+        .affil-card:hover .click-hint { opacity: 1; }
+
+        /* Footer */
+        footer { background: var(--primary); color: #dcdcdc; padding: 70px 5% 20px; }
+        .footer-container { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+        .footer-logo h2 { color: var(--white); font-weight: 800; margin-bottom: 20px; font-size: 1.8rem; }
+        .footer-logo span { color: var(--secondary); }
+        .footer-col h3 { color: var(--white); font-size: 1.2rem; margin-bottom: 25px; position: relative; padding-bottom: 10px; }
+        .footer-col h3::after { content: ''; position: absolute; width: 40px; height: 3px; background: var(--secondary); bottom: 0; left: 0; }
+        .footer-col ul li { margin-bottom: 12px; }
+        .footer-col ul li a { color: #dcdcdc; font-size: 0.95rem; transition: 0.3s; }
+        .footer-col ul li a:hover { color: var(--secondary); padding-left: 5px; }
+        .copyright { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 25px; text-align: center; font-size: 0.9rem; display: flex; justify-content: space-between; flex-wrap: wrap; }
+
+        /* --- MODAL POPUP --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 2000;
+            display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-box {
+            background: #fff; width: 800px; max-width: 90%; border-radius: 10px;
+            display: flex; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            transform: scale(0.8); transition: transform 0.3s; overflow: hidden;
+        }
+        .modal-side { width: 35%; background: var(--primary); color: white; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 20px; }
+        .modal-side-img { width: 100%; height: 100%; background-size: cover; background-position: center; }
+        .modal-side i { font-size: 5rem; color: var(--secondary); margin-bottom: 15px; }
+        
+        .modal-content { width: 65%; padding: 40px; position: relative; }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; }
+        .close-btn:hover { color: var(--secondary); }
+        
+        .modal-role { color: var(--secondary); font-weight: 700; font-size: 0.9rem; text-transform: uppercase; margin-bottom: 10px; display: block; }
+        .modal-header { font-size: 1.8rem; color: var(--primary); font-weight: 800; margin-bottom: 20px; line-height: 1.2; }
+        .modal-text { color: #555; line-height: 1.7; font-size: 0.95rem; max-height: 350px; overflow-y: auto; }
+
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-overlay.active .modal-box { transform: scale(1); }
+
+        /* Maintenance Banner */
+        #maintBanner { position: fixed; top: 0; left: 0; width: 100%; background: #c0392b; color: #fff; text-align: center; padding: 12px; font-weight: 700; z-index: 2000; display: none; }
+
+        @media (max-width: 900px) {
+            .nav-menu { display: none; } .modal-box { flex-direction: column; } .modal-side { width: 100%; height: 200px; padding: 0; } .modal-content { width: 100%; }
+        }
+    </style>
+</head>
+<body onload="checkSystem()">
+
+    <div id="maintBanner"><i class="fas fa-exclamation-triangle"></i> THE ERP SYSTEM IS CURRENTLY UNDER MAINTENANCE.</div>
+
+    <div class="top-bar">
+        <div class="contact-info">
+            <span><i class="fas fa-phone-alt"></i> 1800-123-4567</span>
+            <span><i class="fas fa-envelope"></i> admission@kgikanpur.in</span>
+        </div>
+        <div class="social-media">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+    </div>
+
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="KGI Logo" style="height:50px;">
+            
+        </div>
+
+        <ul class="nav-menu">
+            <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+
+            <li class="nav-item">
+                <span class="nav-link">About Us <i class="fas fa-chevron-down"></i></span>
+                <ul class="dropdown">
+                    <li><a href="https://kgikanpur.in/about-kgi/">Institute Overview</a></li>
+                    <li><a href="https://kgikanpur.in/about-kgi/">Vision & Mission</a></li>
+                    <li>
+                        <a href="#">Director's Message <i class="fas fa-caret-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="/*https://kgikanpur.in/chairman-2/*" onclick="openModal('chair')">Chairman's Message</a></li>
+                            <li><a href="https://kgikanpur.in/vc/" onclick="openModal('vice')">Vice Chairman's Message</a></li>
+                            <li><a href="https://kgikanpur.in/director-administration/" onclick="openModal('adm')">Director (Admin)</a></li>
+                            <li><a href="https://kgikanpur.in/director/" onclick="openModal('dir_kiot')">Director (KIOT)</a></li>
+                            <li><a href="https://kgikanpur.in/director-pharmacy/" onclick="openModal('dir_pharm')">Director (Pharmacy)</a></li>
+                            <li><a href="https://kgikanpur.in/director-nursing/" onclick="openModal('dir_mba')">Director (Nursing)</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#affiliations">Affiliations & Approvals</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <span class="nav-link">Academics <i class="fas fa-chevron-down"></i></span>
+                <ul class="dropdown">
+                    
+                    <li>
+                        <a href="#">Engineering <i class="fas fa-caret-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="https://kgikanpur.in/cse/">Computer Science Engineering</a></li>
+                            <li><a href="https://kgikanpur.in/cse-ai-ml/">CSE (AI & ML)</a></li>
+                            <li><a href="https://kgikanpur.in/cse-ds/">CSE (Data Science)</a></li>
+                            <li><a href="https://kgikanpur.in/mechanical-engineering/">Mechanical Engineering</a></li>
+                            <li><a href="https://kgikanpur.in/civil-engineering/">Civil Engineering</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#">Computer Application <i class="fas fa-caret-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="https://kgikanpur.in/bca/">BCA</a></li>
+                            <li><a href="#">MCA</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#">Management <i class="fas fa-caret-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="/kgikanpur.in/bba/">BBA</a></li>
+                            <li><a href="https://kgikanpur.in/mba-2/https:/">MBA</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#">Pharmacy <i class="fas fa-caret-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="https://kgikanpur.in/pharmacy/">B.Pharma</a></li>
+                            <li><a href="https://kgikanpur.in/d-pharm/">D.Pharma</a></li>
+                            <li><a href="https://kgikanpur.in/m-pharm/">M.Pharma</a></li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a href="#">Nursing <i class="fas fa-caret-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="https://kgikanpur.in/b-sc-nursing/">B.Sc Nursing</a></li>
+                            <li><a href="https://kgikanpur.in/m-sc-nursing/">M.Sc Nursing</a></li>
+                            <li><a href="https://kgikanpur.in/post-b-sc-nursing/">Post-B.Sc Nursing</a></li>
+                            <li><a href="https://kgikanpur.in/gnm/">GNM</a></li>
+                            <li><a href="https://kgikanpur.in/anm/">ANM</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="https://kgikanpur.in/paramedical/">Paramedical <i class="fas fa-arrow-right"></i></a>
+                        <ul class="dropdown-sub">
+                            <li><a href="https://kgikanpur.in/paramedical/">View All Programs</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">Unsolved Qustion Paper <i class="fas fa-caret-right"></i><a>
+                            <ul class="dropdown-sub">
+                                <li><a href="https://unsolved.kgiapp.in/Engineering/"">Engineering</a></li>
+                                <li><a href="https://kgikanpur.in/#">Computer Application</a></li>
+                                <li><a href="https://unsolved.kgiapp.in/management/">Management</a></li>
+                                <li><a href="https://kgikanpur.in/#">Pharmacy</a></li>
+                                <li><a href="https://kgikanpur.in/#">Nursing</a></li>
+                            </ul>
+                    </li>
+                </ul>
+            </li>
+
+
+            <li class="nav-item">
+                <span class="nav-link">Admissions <i class="fas fa-chevron-down"></i></span>
+                <ul class="dropdown">
+                    <li><a href="https://kgikanpur.in/career/">Carrier </a></li>
+                    <li><a href="https://kgikanpur.in/fee-structure/">Fee Structure</a></li>
+                    <li><a href="#" onclick="openAdmissionModal()">Apply Online</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <span class="nav-link">Placement<i class="fas fa-chevron-down"></i></span>
+                <ul class="dropdown">
+                    <li><a href="https://kgikanpur.in/placement/">Placement Overview</a></li>
+                    <li><a href="https://kgikanpur.in/training-csd/">Training & Internship</a></li>
+                    <li><a href="https://kgikanpur.in/seminar-webinar/">Seminars & Webinars</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <span class="nav-link">Events<i class="fas fa-chevron-down"></i></span>
+                <ul class="dropdown">
+                    <li><a href="#">Upcoming Events</a></li>
+                    <li><a href="#">Past Events</a></li>
+                </ul>
+            </li>
+
+            <li class="nav-item">
+                <a href="Home.html" class="btn-erp">ERP LOGIN</a>
+            </li>
+        </ul>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">Admissions Open 2026</span>
+            <h1>EMPOWERING FUTURE <br> INNOVATORS</h1>
+            <p>Krishna Group of Institutions provides world-class education with state-of-the-art infrastructure.</p>
+            <div class="hero-btns">
+                <a href="#" class="btn-main" onclick="openAdmissionModal()">APPLY NOW</a>
+                <a href="https://kgikanpur.in" class="btn-outline">VIRTUAL TOUR</a>
+            </div>
+        </div>
+    </section>
+
+    <div class="news-ticker">
+        <div class="ticker-title">Latest Updates</div>
+        <div class="ticker-content">
+            <marquee behavior="scroll" direction="left" onmouseover="this.stop();" onmouseout="this.start();">
+                ★ Registration for B.Tech & MBA (Batch 2026) is now open. Apply online! &nbsp;&nbsp;&nbsp; 
+                ★ KGI Ranked #1 in Kanpur for Engineering Placements. &nbsp;&nbsp;&nbsp; 
+                ★ ERP System Maintenance scheduled for Sunday 10 PM.
+                &nbsp;&nbsp;&nbsp;
+                ★ New AI & Data Science Lab inaugurated at KGI Campus.
+
+            </marquee>
+        </div>
+    </div>
+
+    <section class="courses-section">
+        <span class="section-tag">Our Programs</span>
+        <h2 class="section-title">Academic Disciplines</h2>
+        <div class="courses-grid">
+            <div class="course-card">
+                <div class="course-icon"><i class="fas fa-laptop-code"></i></div>
+                <h3>Computer Science</h3>
+                <p>AI, Machine Learning, Data Science, and Full Stack Development.</p>
+                <a href="#" class="read-more">View Syllabus <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="course-card">
+                <div class="course-icon"><i class="fas fa-cogs"></i></div>
+                <h3>Mechanical Engg.</h3>
+                <p>Robotics, Automation, and 3D Printing technologies.</p>
+                <a href="https://kgikanpur.in/mechanical-engineering/" class="read-more">View Syllabus <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="course-card">
+                <div class="course-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>MBA</h3>
+                <p>Specializations in HR, Finance, Marketing and IT.</p>
+                <a href="https://kgikanpur.in/mba-2/" class="read-more">View Syllabus <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="course-card">
+                <div class="course-icon"><i class="fas fa-flask"></i></div>
+                <h3>Pharmacy</h3>
+                <p>Comprehensive pharmaceutical education with modern labs.</p>
+                <a href="#" class="read-more">View Syllabus <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </section>
+
+    <section id="affiliations" class="affil-section">
+        <span class="section-tag">Accreditations</span>
+        <h2 class="section-title">Affiliations & Approvals</h2>
+        <div class="affil-grid">
+            <div class="affil-card" onclick="openModal('aicte')">
+                <i class="fas fa-university affil-icon"></i>
+                <h3>AICTE Approved</h3>
+                <p>All India Council for Technical Education</p>
+                <span class="click-hint">View Details <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="affil-card" onclick="openModal('aktu')">
+                <i class="fas fa-graduation-cap affil-icon"></i>
+                <h3>AKTU Affiliated</h3>
+                <p>Dr. A.P.J. Abdul Kalam Technical University</p>
+                <span class="click-hint">View Details <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="affil-card" onclick="openModal('pci')">
+                <i class="fas fa-flask affil-icon"></i>
+                <h3>PCI Approved</h3>
+                <p>Pharmacy Council of India</p>
+                <span class="click-hint">View Details <i class="fas fa-arrow-right"></i></span>
+            </div>
+            <div class="affil-card" onclick="openModal('bte')">
+                <i class="fas fa-cogs affil-icon"></i>
+                <h3>BTE UP Affiliated</h3>
+                <p>Board of Technical Education, UP</p>
+                <span class="click-hint">View Details <i class="fas fa-arrow-right"></i></span>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <div class="footer-logo">
+                <h2>KGI <span>KANPUR</span></h2>
+                <p style="color:#aaa; font-size:0.9rem;">
+                    KGI Campus, Kanpur-Allahabad Highway,<br>
+                    Kanpur, Uttar Pradesh - 208001<br><br>
+                    <strong style="color:#fff;">Email:</strong> info@kgikanpur.in
+                </p>
+            </div>
+            <div class="footer-col">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="https://kgikanpur.in/about-kgi/">About Us</a>
+                    <li><a href="https://kgikanpur.in/career/">Career</a></li>
+                    <li><a href="https://kgikanpur.in/placement/">Placementrier</a></li>
+                    <li><a href="https://kgikanpur.in/events/">Events</a></li>
+                    <li><a href="https://kgikanpur.in/fee-structure/">Fee Structure</a></li>
+                    
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>ERP Access</h3>
+                <ul>
+                    <li><a href="student_login.html">Student Portal</a></li>
+                    <li><a href="employee_login.html">Faculty Portal</a></li>
+                    <li><a href="super_admin.html">Admin Console</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <span>&copy; 2026 Krishna Group of Institutions.</span>
+        </div>
+    </footer>
+
+    <div id="universalModal" class="modal-overlay">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-side" id="mSide">
+                <div id="mSideImg" class="modal-side-img"></div>
+                <i class="fas fa-university" id="mIcon" style="display:none;"></i>
+            </div>
+            <div class="modal-content">
+                <span class="modal-role" id="mRole">CATEGORY</span>
+                <h2 class="modal-header" id="mHeader">Header Text</h2>
+                <div class="modal-text" id="mText">Content goes here...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="admissionModal" class="modal-overlay">
+        <div class="modal-box" style="width: 500px; display:block; padding:0;">
+            <div style="background:var(--primary); padding:20px; display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color:#fff; margin:0;">New Admission Form</h3>
+                <i class="fas fa-times" onclick="closeAdmissionModal()" style="color:#fff; cursor:pointer; font-size:1.2rem;"></i>
+            </div>
+            <div style="padding:30px;">
+                <form onsubmit="submitAdmission(event)">
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; font-size:0.9rem;">Full Name</label>
+                        <input type="text" id="admName" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; font-size:0.9rem;">Father's Name</label>
+                        <input type="text" id="admFather" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:15px;">
+                        <div>
+                            <label style="font-weight:600; font-size:0.9rem;">Mobile No</label>
+                            <input type="text" id="admMobile" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                        </div>
+                        <div>
+                            <label style="font-weight:600; font-size:0.9rem;">Select Course</label>
+                            <select id="admCourse" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                                <option>B.Tech (CSE)</option>
+                                <option>B.Tech (ME)</option>
+                                <option>MBA</option>
+                                <option>Pharmacy</option>
+                                <option>Polytechnic</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="margin-bottom:15px;">
+                        <label style="font-weight:600; font-size:0.9rem;">Email ID</label>
+                        <input type="email" id="admEmail" required style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;">
+                    </div>
+                    <div style="margin-bottom:20px;">
+                        <label style="font-weight:600; font-size:0.9rem;">Address</label>
+                        <textarea id="admAddress" rows="2" style="width:100%; padding:10px; border:1px solid #ccc; border-radius:5px;"></textarea>
+                    </div>
+                    <button type="submit" class="btn-erp" style="width:100%; margin:0; border:none; padding:12px;">SUBMIT APPLICATION</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STORE ---
+        const contentData = {
+            // Directors
+            'chair': { 
+                type: 'msg', role: 'FROM THE DESK OF CHAIRMAN', title: 'Mr. Raghvendra Garg', 
+                img: 'https://kgikanpur.in/wp-content/uploads/2022/02/Chairman-sir-300x300.jpeg', 
+                text: '"We cannot always build the future for our youth, but we can build our youth for the future. Beyond providing a sound education, we wish to provide our students a holistic learning experience for life. Our aim is to teach students to LEARN, not just STUDY. Building Careers, Transforming Lives is our motto."' 
+            },
+            'vice': { 
+                type: 'msg', role: 'VICE CHAIRMAN\'S MESSAGE', title: 'Mr. Vaibhav Garg', 
+                img: 'https://kgikanpur.in/wp-content/uploads/2025/05/vaibhav-e1748248057640-768x731.jpeg', 
+                text: '"A REMARKABLE JOURNEY. NURTURING GREATNESS, AND GREAT CHANGE. It is with great pleasure that I extend a warm welcome to the Krishna Group of Institutions. We offer a comprehensive array of academic programs in Engineering, Management, Pharmacy, Nursing, and Paramedical Sciences."' 
+            },
+            'adm': { 
+                type: 'msg', role: 'DIRECTOR (ADMIN)', title: 'Mr. Saubhagya Mehrotra', 
+                img: 'https://kgikanpur.in/wp-content/uploads/2022/02/WhatsApp-Image-2022-02-19-at-4.15.39-PM.jpeg', 
+                text: '"Nurturing Leaders for tomorrow - the motto that clearly states our vision. Education isn’t a static accomplishment; it is much more dynamic and sensitive in the real and practical world. We work towards polishing of student’s employability skills."' 
+            },
+            'dir_kiot': { type: 'msg', role: 'DIRECTOR (KIOT)', title: 'Prof. (Dr.) V.K. Singh', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=500&q=80', text: '"Engineering is about solving real-world problems. At KIOT, we focus on practical innovation."' },
+            'dir_pharm': { type: 'msg', role: 'DIRECTOR (PHARMACY)', title: 'Prof. Dr. Anjali Verma', img: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=500&q=80', text: '"Pharmacy is the science of healing. We train students to be compassionate healthcare professionals."' },
+
+            // Affiliations
+            'aicte': { type: 'cert', role: 'Govt. of India', title: 'AICTE Approved', icon: 'fa-university', text: 'Krishna Group of Institutions is approved by the All India Council for Technical Education (AICTE), New Delhi, statutory body under the Ministry of Education, Govt. of India. All Engineering and Management courses follow AICTE norms.' },
+            'aktu': { type: 'cert', role: 'State University', title: 'AKTU Affiliated', icon: 'fa-graduation-cap', text: 'The institute is affiliated to Dr. A.P.J. Abdul Kalam Technical University (AKTU), Lucknow (formerly UPTU). Code: 123. The curriculum and examinations are conducted as per university guidelines.' },
+            'pci': { type: 'cert', role: 'Pharmacy Council', title: 'PCI Approved', icon: 'fa-flask', text: 'Our Faculty of Pharmacy is approved by the Pharmacy Council of India (PCI), New Delhi under section 12 of the Pharmacy Act 1948 for B.Pharma and D.Pharma courses.' },
+            'bte': { type: 'cert', role: 'State Board', title: 'BTE UP Affiliated', icon: 'fa-cogs', text: 'Polytechnic (Diploma) courses in Mechanical, Civil, and Electrical Engineering are affiliated to the Board of Technical Education (BTE), Uttar Pradesh.' }
+        };
+
+        // --- MODAL LOGIC ---
+        function openModal(key) {
+            const data = contentData[key];
+            if(!data) return;
+
+            document.getElementById('mRole').innerText = data.role;
+            document.getElementById('mHeader').innerText = data.title;
+            document.getElementById('mText').innerText = data.text;
+            
+            const imgDiv = document.getElementById('mSideImg');
+            const iconDiv = document.getElementById('mIcon');
+            const sideDiv = document.getElementById('mSide');
+
+            if (data.type === 'msg') {
+                // Show Image for People
+                imgDiv.style.display = 'block';
+                imgDiv.style.backgroundImage = `url('${data.img}')`;
+                iconDiv.style.display = 'none';
+                sideDiv.style.padding = '0';
+            } else {
+                // Show Icon for Affiliations
+                imgDiv.style.display = 'none';
+                iconDiv.style.display = 'block';
+                iconDiv.className = `fas ${data.icon}`;
+                sideDiv.style.padding = '20px';
+            }
+
+            document.getElementById('universalModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('universalModal').classList.remove('active');
+        }
+
+        function openAdmissionModal() {
+            document.getElementById('admissionModal').classList.add('active');
+        }
+        function closeAdmissionModal() {
+            document.getElementById('admissionModal').classList.remove('active');
+        }
+
+        function submitAdmission(e) {
+            e.preventDefault();
+            const data = {
+                fullname: document.getElementById('admName').value,
+                fathername: document.getElementById('admFather').value,
+                mobile: document.getElementById('admMobile').value,
+                course: document.getElementById('admCourse').value,
+                email: document.getElementById('admEmail').value,
+                address: document.getElementById('admAddress').value
+            };
+
+            fetch('http://localhost:5000/api/admission/apply', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === 'success') {
+                    alert("Application Submitted Successfully! Our team will contact you.");
+                    closeAdmissionModal();
+                    e.target.reset();
+                } else {
+                    alert("Error: " + response.message);
+                }
+            });
+        }
+
+        window.onclick = function(e) {
+            if(e.target == document.getElementById('universalModal')) closeModal();
+            if(e.target == document.getElementById('admissionModal')) closeAdmissionModal();
+        }
+
+        // --- MAINTENANCE CHECK ---
+        function checkSystem() {
+            fetch('http://localhost:5000/api/config').then(r=>r.json()).then(c => {
+                if(c.maintenance) {
+                    const b = document.getElementById("maintBanner");
+                    b.style.display = "block";
+                    document.body.style.paddingTop = b.offsetHeight + "px";
+                    document.querySelector('.btn-erp').onclick = (e) => { e.preventDefault(); alert("Under Maintenance"); };
+                }
+            }).catch(e=>{});
+        }
+    </script>
+
+</body>
+</html>
