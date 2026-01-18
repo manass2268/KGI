@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Login | KGI ERP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- GLOBAL STYLES --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f0f2f5; background-image: radial-gradient(#dfe3e8 1px, transparent 1px); background-size: 20px 20px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .logo-container { text-align: center; margin-bottom: 20px; }
+        #collegeLogo { width: 180px; height: auto; display: inline-block; transition: transform 0.3s; }
+        #collegeLogo:hover { transform: scale(1.05); }
+
+        /* --- LOGIN BOX --- */
+        .login-box { background: #fff; width: 90%; max-width: 850px; padding: 40px 50px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border: 1px solid #e1e1e1; text-align: center; }
+        .form-row { display: flex; gap: 40px; margin-bottom: 30px; text-align: left; }
+        .input-group { flex: 1; display: flex; flex-direction: column; }
+        .input-label { font-size: 1.1rem; font-weight: 800; color: #1a3c6e; margin-bottom: 10px; text-transform: uppercase; }
+        .form-control { padding: 15px; font-size: 1.2rem; border: 1px solid #ccc; border-radius: 4px; background: #fdfdfd; transition: border 0.3s; width: 100%; }
+        .form-control:focus { border-color: #1a3c6e; outline: none; background: #fff; }
+        
+        /* --- CAPTCHA --- */
+        .captcha-section { background: #f9f9f9; padding: 20px; border-radius: 5px; margin-bottom: 20px; text-align: left; }
+        .captcha-row { display: flex; align-items: center; gap: 20px; }
+        .captcha-code { font-family: 'Courier New', monospace; font-size: 2rem; font-weight: bold; color: #d32f2f; letter-spacing: 5px; text-decoration: line-through; background: #e0e0e0; padding: 5px 15px; border-radius: 4px; user-select: none; min-width: 150px; text-align: center; }
+        .refresh-icon { font-size: 1.8rem; cursor: pointer; color: #333; }
+        
+        /* --- FOOTER & BUTTONS --- */
+        .form-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; margin-bottom: 25px; }
+        .btn-login { background: #0d2c5a; color: #fff; padding: 15px 50px; font-size: 1.2rem; font-weight: 700; border: none; border-radius: 5px; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-login:disabled { background: #ccc; cursor: not-allowed; }
+        .ip-section { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; color: #d32f2f; font-size: 0.95rem; font-weight: 500; }
+        #ipAddress { color: #333; font-weight: 700; background: #fff3cd; padding: 2px 6px; border-radius: 4px; border: 1px solid #ffeeba; }
+        .page-footer { text-align: center; margin-top: 40px; color: #555; font-size: 0.95rem; line-height: 1.6; }
+        
+        .login-error { color: white; background: #d32f2f; padding: 10px; border-radius: 5px; margin-bottom: 20px; display: none; font-weight: bold; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* --- PASSWORD MODAL --- */
+        .pwd-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; z-index: 9999; }
+        .pwd-box { background: #fff; padding: 30px; border-radius: 8px; width: 400px; text-align: center; border-top: 5px solid #d32f2f; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .pwd-title { font-size: 1.4rem; font-weight: bold; color: #d32f2f; margin-bottom: 10px; }
+        .pwd-desc { font-size: 0.95rem; color: #555; margin-bottom: 20px; line-height: 1.5; }
+
+        @media (max-width: 768px) { .form-row { flex-direction: column; gap: 20px; } .btn-login { width: 100%; } }
+    </style>
+</head>
+<body onload="initializePage()">
+
+    <div class="logo-container">
+        <img src="https://erp.kgikanpur.com/Images/logo.png" id="collegeLogo" alt="KGI Logo">
+    </div>
+    <div class="login-box">
+        
+        <div id="loginError" class="login-error">
+            <div id="errorMsgText"><i class="fas fa-exclamation-circle"></i> Invalid User ID or Password!</div>
+        </div>
+
+        <form onsubmit="return handleLogin(event)">
+            <div class="form-row">
+                <div class="input-group">
+                    <label class="input-label">USER ID</label>
+                    <input type="text" id="userIdInput" class="form-control" placeholder="Enter User Id" required oninput="this.value = this.value.toUpperCase()">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">PASSWORD</label>
+                    <input type="password" id="passwordInput" class="form-control" placeholder="Enter Password" required>
+                </div>
+            </div>
+
+            <div class="captcha-section">
+                <div style="font-weight: 700; margin-bottom: 10px;">Prove You're not a robot</div>
+                <div class="captcha-row">
+                    <input type="text" id="captchaInput" class="form-control" placeholder="Verify Captcha" style="flex:1;" required>
+                    <div id="captchaDisplay" class="captcha-code"></div>
+                    <i class="fas fa-sync-alt refresh-icon" onclick="generateCaptcha()" title="Refresh Captcha"></i>
+                </div>
+                <p id="captchaError" style="color: red; margin-top: 10px; font-weight: bold; display: none;">Invalid Captcha!</p>
+            </div>
+
+            <div class="form-footer">
+                <a href="#" style="color:#1a3c6e; font-weight:700; text-decoration:none;">I FORGOT MY PASSWORD</a>
+                <button type="submit" id="loginBtn" class="btn-login">
+                    <div class="loader" id="btnLoader"></div>
+                    <span id="btnText">LOGIN</span>
+                </button>
+            </div>
+
+            <div class="ip-section">
+                <span><i class="fas fa-exclamation-triangle"></i> CAUTION:</span>
+                Your IP address <span id="ipAddress">Detecting...</span> is being monitored for security purpose.
+            </div>
+        </form>
+    </div>
+
+    <div id="pwdModal" class="pwd-modal">
+        <div class="pwd-box">
+            <div class="pwd-title"><i class="fas fa-lock"></i> Security Update Required</div>
+            <div class="pwd-desc">
+                Since this is your first login (or your password matches your ID), you must set a new secure password to proceed.
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="font-weight:bold; font-size:0.9rem;">New Password</label>
+                <input type="password" id="newPass1" class="form-control" placeholder="Enter new password" style="margin-bottom:0;">
+            </div>
+            <div style="text-align: left; margin-bottom: 20px;">
+                <label style="font-weight:bold; font-size:0.9rem;">Confirm Password</label>
+                <input type="password" id="newPass2" class="form-control" placeholder="Re-enter password" style="margin-bottom:0;">
+            </div>
+            
+            <button type="button" class="btn-login" style="background:#d32f2f;" onclick="updatePassword()">UPDATE & LOGIN</button>
+        </div>
+    </div>
+
+    <div class="page-footer">
+        <strong>Welcome To</strong><br>Krishna Group of Institutions (KGI)<br>Intelligent Institute Automation System (IERP)<br>
+    </div>
+
+    <script>
+        (function checkSystemStatus() {
+            fetch('http://localhost:5000/api/config')
+            .then(res => res.json())
+            .then(config => {
+                // 1. MAINTENANCE MODE LOCK
+                if (config.maintenance === true) {
+                    document.body.innerHTML = `
+                        <div style="height:100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; background:#1a1a25; color:#fff; text-align:center;">
+                            <i class="fas fa-tools" style="font-size:5rem; color:#e14eca; margin-bottom:20px;"></i>
+                            <h1 style="font-size:3rem; margin-bottom:10px;">SYSTEM UNDER MAINTENANCE</h1>
+                            <p style="color:#aaa;">The admin has currently locked the system for upgrades.</p>
+                            <p style="color:#aaa;">Please try again later.</p>
+                        </div>
+                    `;
+                }
+                // 2. BROADCAST MESSAGE
+                if (config.message && config.message.trim() !== "") {
+                    const msgBox = document.createElement("div");
+                    msgBox.style.cssText = "position:fixed; top:0; left:0; width:100%; background:#ffeb3b; color:#000; padding:12px; text-align:center; font-weight:bold; z-index:9999; border-bottom:2px solid #e1e1e1;";
+                    msgBox.innerHTML = "<i class='fas fa-bullhorn'></i> NOTICE: " + config.message;
+                    document.body.prepend(msgBox);
+                }
+                // 3. REGISTRATION LOCK
+                if (config.allowReg === false) {
+                    // Agar koi register link hota to use hide karte
+                }
+            })
+            .catch(err => console.log("Server Offline or Config Error"));
+        })();
+    </script>
+
+    <script>
+        // Global var to hold user data during password change
+        let tempUserData = null; 
+
+        function initializePage() {
+            generateCaptcha();
+            fetchUserIP();
+        }
+
+        function fetchUserIP() {
+            fetch('https://api.ipify.org?format=json')
+            .then(r => r.json()).then(d => { document.getElementById('ipAddress').textContent = d.ip; })
+            .catch(() => { document.getElementById('ipAddress').textContent = "Unknown"; });
+        }
+
+        function generateCaptcha() {
+            document.getElementById("captchaError").style.display = "none";
+            document.getElementById("captchaInput").value = "";
+            let chars = "0123456789ABCDEFGH", g = "";
+            for (let i=0; i<6; i++) g += chars.charAt(Math.floor(Math.random() * chars.length));
+            document.getElementById("captchaDisplay").innerHTML = g;
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById("userIdInput").value.trim().toUpperCase();
+            const password = document.getElementById("passwordInput").value.trim();
+            const userCaptcha = document.getElementById("captchaInput").value.trim();
+            const realCaptcha = document.getElementById("captchaDisplay").innerHTML;
+            
+            const errorBox = document.getElementById("loginError");
+            const btn = document.getElementById("loginBtn");
+            const loader = document.getElementById("btnLoader");
+            const btnText = document.getElementById("btnText");
+
+            // Reset UI
+            errorBox.style.display = "none";
+            document.getElementById("captchaError").style.display = "none";
+
+            // 1. CAPTCHA CHECK
+            if (userCaptcha !== realCaptcha) {
+                document.getElementById("captchaError").style.display = "block";
+                generateCaptcha();
+                return;
+            }
+
+            // UI Loading
+            btn.disabled = true;
+            loader.style.display = "block";
+            btnText.innerText = "VERIFYING...";
+
+            // 2. FETCH DATA FROM PYTHON API (MYSQL)
+            fetch('http://localhost:5000/api?type=student')
+            .then(res => res.json())
+            .then(data => {
+                // Find User
+                const user = data.find(u => u.roll_no === userId && u.password === password);
+
+                if (user) {
+                    // --- SUCCESS ---
+                    
+                    // CHECK FOR FIRST TIME LOGIN (Force Password Change)
+                    if (user.password === user.roll_no) {
+                        tempUserData = user; // Save for update function
+                        
+                        document.getElementById("pwdModal").style.display = "flex";
+                        // Reset Login Button
+                        btn.disabled = false;
+                        loader.style.display = "none";
+                        btnText.innerText = "LOGIN";
+                    } else {
+                        // Normal Login
+                        performRedirect(user);
+                    }
+
+                } else {
+                    // --- FAIL ---
+                    errorBox.style.display = "block";
+                    document.getElementById("errorMsgText").innerHTML = '<i class="fas fa-exclamation-circle"></i> Invalid User ID or Password!';
+                    generateCaptcha();
+                    
+                    btn.disabled = false;
+                    loader.style.display = "none";
+                    btnText.innerText = "LOGIN";
+                }
+            })
+            .catch(err => {
+                alert("Server Error: Make sure Python app.py is running!");
+                btn.disabled = false;
+                loader.style.display = "none";
+                btnText.innerText = "LOGIN";
+            });
+        }
+
+        // --- PASSWORD UPDATE (API CALL) ---
+        function updatePassword() {
+            const p1 = document.getElementById("newPass1").value.trim();
+            const p2 = document.getElementById("newPass2").value.trim();
+
+            if (p1.length < 4) { alert("Password must be at least 4 characters!"); return; }
+            if (p1 !== p2) { alert("Passwords do not match!"); return; }
+            if (p1 === tempUserData.roll_no) { alert("New password cannot be same as User ID!"); return; }
+
+            // Prepare Data for API (Need all fields to update correctly)
+            const updateData = {
+                type: 'student',
+                isEdit: true,
+                oldId: tempUserData.roll_no,
+                
+                // Fields to update
+                id: tempUserData.roll_no,
+                name: tempUserData.name,
+                pass: p1, // New Password
+                mobile: tempUserData.mobile,
+                course: tempUserData.course,
+                branch: tempUserData.branch,
+                sem: tempUserData.semester,
+                sec: tempUserData.section
+            };
+
+            // Call API
+            fetch('http://localhost:5000/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updateData)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === 'success') {
+                    alert("Password Updated Successfully! Logging in...");
+                    document.getElementById("pwdModal").style.display = "none";
+                    
+                    // Auto Login with new password
+                    tempUserData.password = p1;
+                    performRedirect(tempUserData);
+                } else {
+                    alert("Update Failed: " + response.message);
+                }
+            })
+            .catch(err => alert("Server Error during update"));
+        }
+
+        function performRedirect(user) {
+            // Store session in LocalStorage for Dashboard to read
+            localStorage.setItem("loggedInUser", user.name);
+            localStorage.setItem("loggedInID", user.roll_no);
+            
+            document.getElementById("btnText").innerText = "SUCCESS!";
+            document.getElementById("loginBtn").style.background = "#2e7d32";
+            
+            // Go to Dashboard
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 500);
+        }
+    </script>
+</body>
+</html>

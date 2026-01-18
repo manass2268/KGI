@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Faculty Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- THEME --- */
+        :root { --primary: #c0392b; --sidebar: #2c3e50; --bg: #ecf0f1; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); display: flex; height: 100vh; margin: 0; overflow: hidden; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 250px; background: var(--sidebar); color: #fff; display: flex; flex-direction: column; }
+        .brand { padding: 20px; font-size: 1.2rem; font-weight: bold; background: rgba(0,0,0,0.2); text-align: center; border-left: 5px solid var(--primary); }
+        .profile { padding: 20px; border-bottom: 1px solid #34495e; }
+        .menu { list-style: none; padding: 0; margin-top: 10px; }
+        .menu li { padding: 15px 20px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+        .menu li:hover, .menu li.active { background: var(--primary); }
+        
+        /* MAIN */
+        .main { flex: 1; padding: 20px; overflow-y: auto; }
+        .header { background: #fff; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .card { background: #fff; padding: 20px; border-radius: 8px; border-top: 4px solid var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .card h3 { font-size: 2rem; margin-bottom: 5px; color: #333; }
+        
+        .view-section { display: none; margin-top: 20px; background: #fff; padding: 20px; border-radius: 8px; }
+        .view-section.active { display: block; animation: fade 0.3s; }
+        @keyframes fade { from {opacity: 0;} to {opacity: 1;} }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background: #34495e; color: #fff; padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #f9f9f9; }
+    </style>
+</head>
+<body onload="initDashboard()">
+
+    <div class="sidebar">
+        <div class="brand">KGI FACULTY</div>
+        <div class="profile">
+            <h4 id="fName">Loading...</h4>
+            <p id="fDesig" style="font-size:0.8rem; opacity:0.7;">...</p>
+        </div>
+        <ul class="menu">
+            <li onclick="switchTab('home')" class="active"><i class="fas fa-home"></i> Overview</li>
+            <li onclick="switchTab('students')"><i class="fas fa-users"></i> My Students</li>
+            <li onclick="switchTab('attendance')"><i class="fas fa-check-square"></i> Mark Attendance</li>
+            <li onclick="switchTab('marks')"><i class="fas fa-edit"></i> Upload Marks</li>
+            <li onclick="logout()" style="margin-top:auto; background:#c0392b;"><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
+    </div>
+
+    <div class="main">
+        <div class="header">
+            <h2 id="pageTitle">Overview</h2>
+            <span id="dateDisplay" style="font-weight:bold; color:#7f8c8d;">Date</span>
+        </div>
+
+        <div id="homeView" class="view-section active">
+            <div class="grid">
+                <div class="card">
+                    <h3 id="totalStu">0</h3>
+                    <p>Total Students</p>
+                </div>
+                <div class="card" style="border-color: #f39c12;">
+                    <h3>4</h3>
+                    <p>Classes Today</p>
+                </div>
+                <div class="card" style="border-color: #27ae60;">
+                    <h3>Active</h3>
+                    <p>System Status</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-left: 5px solid #f1c40f; border-radius: 5px;">
+                <strong><i class="fas fa-bullhorn"></i> ADMIN NOTICE:</strong> <span id="adminMsg">No new notices.</span>
+            </div>
+        </div>
+
+        <div id="studentsView" class="view-section">
+            <h3>Student Directory</h3>
+            <button onclick="loadStudents()" style="padding:8px 15px; background:#34495e; color:white; border:none; border-radius:4px; cursor:pointer; margin-bottom:10px;">Refresh List</button>
+            <table>
+                <thead><tr><th>Roll No</th><th>Name</th><th>Course</th><th>Branch</th><th>Sem</th></tr></thead>
+                <tbody id="stuTableBody">
+                    <tr><td colspan="5">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="attendanceView" class="view-section">
+            <h3>Attendance Interface</h3>
+            <p>Select Class to mark attendance...</p>
+            <div style="padding: 20px; text-align: center; color: #bbb; border: 2px dashed #ddd;">Attendance Module Loading...</div>
+        </div>
+        
+        <div id="marksView" class="view-section">
+            <h3>Upload Marks</h3>
+            <p>Examination Portal Connection Established.</p>
+            <div style="padding: 20px; text-align: center; color: #bbb; border: 2px dashed #ddd;">Marks Module Loading...</div>
+        </div>
+
+    </div>
+
+    <script>
+        function initDashboard() {
+            const user = JSON.parse(localStorage.getItem("empUser"));
+            if(!user) { window.location.href = "employee_login.html"; return; }
+
+            document.getElementById("fName").innerText = user.name;
+            document.getElementById("fDesig").innerText = user.designation + " (" + user.department + ")";
+            document.getElementById("dateDisplay").innerText = new Date().toDateString();
+
+            // Load Data
+            loadStudents();
+            loadConfig();
+        }
+
+        // FETCH STUDENTS FROM MYSQL
+        function loadStudents() {
+            fetch('http://localhost:5000/api?type=student')
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("totalStu").innerText = data.length;
+                const tbody = document.getElementById("stuTableBody");
+                tbody.innerHTML = "";
+                
+                if(data.length === 0) { tbody.innerHTML = "<tr><td colspan='5'>No students found</td></tr>"; return; }
+
+                data.forEach(s => {
+                    tbody.innerHTML += `<tr>
+                        <td><b>${s.roll_no}</b></td>
+                        <td>${s.name}</td>
+                        <td>${s.course}</td>
+                        <td>${s.branch}</td>
+                        <td>${s.semester}</td>
+                    </tr>`;
+                });
+            });
+        }
+
+        // LOAD ADMIN NOTICE
+        function loadConfig() {
+            fetch('http://localhost:5000/api/config').then(r=>r.json()).then(c => {
+                if(c.message) document.getElementById("adminMsg").innerText = c.message;
+                if(c.maintenance) { alert("System Maintenance Started!"); logout(); }
+            });
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.view-section').forEach(d => d.classList.remove('active'));
+            document.querySelectorAll('.menu li').forEach(l => l.classList.remove('active'));
+            
+            if(tab === 'home') { document.getElementById('homeView').classList.add('active'); event.currentTarget.classList.add('active'); }
+            if(tab === 'students') { document.getElementById('studentsView').classList.add('active'); event.currentTarget.classList.add('active'); }
+            if(tab === 'attendance') { document.getElementById('attendanceView').classList.add('active'); event.currentTarget.classList.add('active'); }
+            if(tab === 'marks') { document.getElementById('marksView').classList.add('active'); event.currentTarget.classList.add('active'); }
+            
+            document.getElementById("pageTitle").innerText = tab.toUpperCase();
+        }
+
+        function logout() {
+            localStorage.removeItem("empUser");
+            window.location.href = "employee_login.html";
+        }
+    </script>
+</body>
+</html>

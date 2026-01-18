@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGI Student Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. THEME VARIABLES (Based on Screenshots) --- */
+        :root {
+            --sidebar-bg: #263238;   /* Dark Slate */
+            --header-bg: #ffffff;
+            --primary-teal: #26c6da; /* The KGI Teal Color */
+            --header-blue: #42a5f5;  /* Blue for Documents header */
+            --text-dark: #333;
+            --text-light: #555;
+            --bg-body: #f1f5f9;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: var(--bg-body); display: flex; height: 100vh; overflow: hidden; font-size: 13px; }
+
+        /* --- 2. SIDEBAR --- */
+        .sidebar {
+            width: 250px;
+            background: var(--sidebar-bg);
+            color: #cfd8dc;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            flex-shrink: 0;
+        }
+        .logo-area { height: 50px; background: #fff; display: flex; align-items: center; padding: 0 10px; }
+        .logo-area img { height: 35px; }
+        
+        .nav-menu { flex: 1; overflow-y: auto; padding-top: 10px; }
+        .nav-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+            display: flex; align-items: center; gap: 10px;
+            transition: 0.2s;
+        }
+        .nav-item:hover, .nav-item.active { background: #37474f; color: #fff; border-left: 4px solid var(--primary-teal); }
+        .nav-item i { width: 20px; text-align: center; }
+
+        /* --- 3. MAIN CONTENT --- */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+        /* Top Bar */
+        .top-bar {
+            height: 50px;
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .search-box input { padding: 5px 10px; border: 1px solid #ccc; border-radius: 3px; width: 200px; }
+        .top-right { display: flex; align-items: center; gap: 15px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .user-profile img { width: 30px; height: 30px; border-radius: 5px; }
+
+        /* SCROLLABLE DASHBOARD AREA */
+        .dashboard-scroll {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto; /* Yahan Scroll Banega */
+        }
+
+        /* --- SECTION 1: PROFILE & ATTENDANCE (Image 1) --- */
+        .welcome-msg { margin-bottom: 15px; color: #d32f2f; font-style: italic; font-weight: 600; }
+
+        .profile-container {
+            background: #fff;
+            padding: 20px;
+            display: flex;
+            gap: 20px;
+            border-top: 3px solid var(--primary-teal);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .profile-pic img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid #eee; object-fit: cover;}
+        
+        .profile-info { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-content: center; }
+        .info-group label { font-weight: bold; display: block; color: #333; margin-bottom: 2px; }
+        .info-group span { color: #555; }
+
+        .fee-header { background: #37474f; color: #fff; padding: 10px 15px; font-weight: bold; margin-bottom: 15px; text-transform: uppercase; border-radius: 3px; }
+
+        /* Green Action Cards */
+        .action-cards { display: flex; gap: 15px; margin-bottom: 20px; }
+        .a-card {
+            flex: 1;
+            background: #66bb6a; /* Green */
+            color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .a-card h4 { font-size: 11px; margin-bottom: 5px; text-transform: uppercase; }
+        .a-card p { font-size: 10px; font-style: italic; opacity: 0.9; }
+
+        /* Attendance Chart Section */
+        .attendance-box {
+            background: #fff;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        
+        /* CSS Only Pie Chart */
+        .pie-chart {
+            width: 150px; height: 150px;
+            border-radius: 50%;
+            background: conic-gradient(#26a69a 0% 87%, #ef5350 87% 100%);
+            position: relative;
+        }
+        .pie-chart::after { /* Donut hole */
+            content: ""; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90px; height: 90px; background: #fff; border-radius: 50%;
+        }
+        
+        .att-stats table { border-collapse: collapse; }
+        .att-stats td { padding: 5px 15px; font-size: 12px; }
+
+        /* --- SECTION 2: TABLES & ASSESSMENT (Image 2) --- */
+        .section-header {
+            background: var(--primary-teal);
+            color: #fff;
+            padding: 8px 15px;
+            font-weight: bold;
+            display: flex; justify-content: space-between; align-items: center;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .custom-table { width: 100%; border-collapse: collapse; background: #fff; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .custom-table th { background: #37474f; color: #fff; padding: 8px; text-align: left; font-size: 11px; }
+        .custom-table td { padding: 8px; border-bottom: 1px solid #eee; color: #444; font-size: 11px; }
+        .custom-table tr:nth-child(even) { background: #f9f9f9; }
+
+        .not-approved { color: red; font-weight: bold; font-size: 10px; }
+        .na-box { background: #e0f7fa; padding: 5px; text-align: center; font-size: 10px; color: #555; }
+
+        /* --- SECTION 3: WIDGETS GRID (Image 3) --- */
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Columns */
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .widget-card {
+            background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 3px;
+            min-height: 200px;
+        }
+        .w-header { padding: 8px 15px; color: #fff; font-weight: bold; font-size: 12px; }
+        .wh-blue { background: var(--header-blue); }
+        .wh-teal { background: var(--primary-teal); }
+        
+        .w-body { padding: 10px; font-size: 12px; min-height: 150px; }
+        .no-record { color: red; font-weight: bold; }
+
+        /* Calendar Fake Layout */
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 5px; margin-top: 10px; }
+        .cal-day { font-weight: bold; color: #555; font-size: 10px; }
+        .cal-date { padding: 5px; background: #eee; border-radius: 3px; }
+        .cal-today { background: #ef5350; color: #fff; }
+
+        /* Full Width Transport Table */
+        .full-width { grid-column: span 3; }
+
+        /* Responsive */
+        @media (max-width: 1000px) {
+            .widgets-grid { grid-template-columns: repeat(2, 1fr); }
+            .full-width { grid-column: span 2; }
+            .profile-info { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; } /* Mobile toggle not included in this snippet for brevity */
+            .widgets-grid { grid-template-columns: 1fr; }
+            .full-width { grid-column: span 1; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area">
+            <h2 style="color: #42a5f5; margin-left:10px;">KGI <span style="font-size:12px; color:#555;">ERP</span></h2>
+        </div>
+        <div class="nav-menu">
+            <div class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+            <div class="nav-item"><i class="fas fa-user-graduate"></i> Students</div>
+            <div class="nav-item"><i class="fas fa-book"></i> Academics</div>
+            <div class="nav-item"><i class="fas fa-calendar-check"></i> Attendance</div>
+            <div class="nav-item"><i class="fas fa-edit"></i> Online Registration</div>
+            <div class="nav-item"><i class="fas fa-clock"></i> Time Table</div>
+            <div class="nav-item"><i class="fas fa-file-alt"></i> Examination</div>
+            <div class="nav-item"><i class="fas fa-cogs"></i> Utilities</div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        
+        <div class="top-bar">
+            <div class="search-box">
+                <i class="fas fa-bars" style="margin-right:15px; cursor:pointer;"></i>
+                <input type="text" placeholder="Page Search">
+            </div>
+            <div class="top-right">
+                <div style="color:orange;"><i class="fas fa-exclamation-circle"></i> Grievance</div>
+                <div class="user-profile">
+                    <img src="https://img.freepik.com/free-photo/portrait-white-man-isolated_53876-40306.jpg" alt="User">
+                    <span id="headerName">MANAS SINGH</span>
+                </div>
+                <i class="fas fa-bell" style="color:#fbc02d;"></i>
+                <i class="fas fa-question-circle" style="color:green;"></i>
+            </div>
+        </div>
+
+        <div class="dashboard-scroll">
+            
+            <h4 style="margin-bottom:5px;">DASHBOARD</h4>
+            <div class="welcome-msg">
+                <i class="fas fa-moon"></i> Good Evening <span id="welcomeName">MANAS SINGH</span>. You have last visited us on 16-Jan-2026 06:19 PM
+            </div>
+
+            <div class="profile-container">
+                <div class="profile-pic">
+                    <img src="https://img.freepik.com/free-photo/portrait-white-man-isolated_53876-40306.jpg" alt="Profile">
+                </div>
+                <div class="profile-info">
+                    <div class="info-group"><label>Name :</label> <span id="profileName">MANAS SINGH</span></div>
+                    <div class="info-group"><label>Branch :</label> <span>BCA_AKTU</span></div>
+                    <div class="info-group"><label>Program :</label> <span>BCA</span></div>
+                    <div class="info-group"><label>Section :</label> <span>A</span></div>
+                    <div class="info-group"><label>Semester :</label> <span>1</span></div>
+                    <div class="info-group"><label>Roll No (URN) :</label> <span>KIOTBCA25018</span></div>
+                </div>
+            </div>
+
+            <div class="fee-header">FEE DETAILS</div>
+
+            <div class="action-cards">
+                <div class="a-card">
+                    <h4>Human Anatomy & Physiology</h4>
+                    <p>Click to View Assignment</p>
+                </div>
+                <div class="a-card">
+                    <h4>Pharmaco Therapeutics</h4>
+                    <p>Click to View Assignment</p>
+                </div>
+                <div class="a-card">
+                    <h4>Theory Assignments</h4>
+                    <p>Click to View Teachers Theory</p>
+                </div>
+            </div>
+
+            <div class="attendance-box">
+                <div>
+                    <h3 style="margin-bottom:10px; color:#444;">Cumulative Attendance</h3>
+                    <div class="pie-chart"></div>
+                    <div style="text-align:center; margin-top:5px; font-weight:bold; color:#666;">87%</div>
+                </div>
+                <div class="att-stats">
+                    <table>
+                        <tr><td><strong>Total Lectures</strong></td><td>316</td></tr>
+                        <tr><td><strong>Total Present</strong></td><td style="color:green;">276</td></tr>
+                        <tr><td><strong>Total Absent</strong></td><td style="color:red;">40</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="section-header">
+                Assessment Summary
+                <i class="fas fa-print" style="cursor:pointer;"></i>
+            </div>
+            
+            <table class="custom-table">
+                <thead>
+                    <tr>
+                        <th>S.NO.</th>
+                        <th>SUBJECT NAME</th>
+                        <th>ATTENDANCE (%)</th>
+                        <th>SESSIONAL MARKS</th>
+                        <th>PRE UNIV MARKS</th>
+                        <th>ASSIGNMENT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>APTITUDE BCA I (BCCAPT108)</td>
+                        <td>96 %</td>
+                        <td class="not-approved">NA</td>
+                        <td class="not-approved">NOT APPROVED</td>
+                        <td class="na-box">NA</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>COMMUNICATION SKILLS (BBC104)</td>
+                        <td>88 %</td>
+                        <td class="not-approved">NOT APPROVED</td>
+                        <td class="not-approved">NOT APPROVED</td>
+                        <td class="na-box">NA</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>ENVIRONMENT AND ECOLOGY (BBC105)</td>
+                        <td>91 %</td>
+                        <td class="not-approved">NOT APPROVED</td>
+                        <td class="not-approved">NOT APPROVED</td>
+                        <td class="na-box">NA</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="section-header" style="background:#26c6da; margin-top:20px;">
+                Time Table
+                <i class="fas fa-print"></i>
+            </div>
+            <div style="background:#e0f7fa; padding:10px; color:red; font-weight:bold; margin-bottom:20px;">
+                Time Table Is Not Available
+            </div>
+
+            <div class="widgets-grid">
+                
+                <div class="widget-card">
+                    <div class="w-header wh-blue">Important Documents/Links</div>
+                    <div class="w-body no-record">No Records Found</div>
+                </div>
+
+                <div class="widget-card">
+                    <div class="w-header wh-teal">My Subjects</div>
+                    <div class="w-body" style="padding:0;">
+                        <table class="custom-table" style="margin:0; box-shadow:none;">
+                            <tr><td style="font-size:10px;"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" width="10"> PYTHON</td></tr>
+                            <tr><td style="font-size:10px;"><img src="https://upload.wikimedia.org/wikipedia/commons/1/18/C_Programming_Language.svg" width="10"> C PROGRAMMING</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="widget-card">
+                    <div class="w-header wh-teal">No Dues Status</div>
+                    <div class="w-body"></div> </div>
+
+                <div class="widget-card">
+                    <div class="w-header wh-teal">Class Co-ordinators</div>
+                    <div class="w-body no-record">No Records Found</div>
+                </div>
+
+                <div class="widget-card">
+                    <div class="w-header wh-teal">To Do List</div>
+                    <div class="w-body no-record">No Records Found!</div>
+                </div>
+
+                <div class="widget-card">
+                    <div class="w-header wh-teal">Calendar</div>
+                    <div class="w-body">
+                        <div style="text-align:center; margin-bottom:5px;">January 2026</div>
+                        <div class="calendar-grid">
+                            <div class="cal-day">Sun</div><div class="cal-day">Mon</div><div class="cal-day">Tue</div><div class="cal-day">Wed</div><div class="cal-day">Thu</div><div class="cal-day">Fri</div><div class="cal-day">Sat</div>
+                            <div class="cal-date"></div><div class="cal-date"></div><div class="cal-date"></div><div class="cal-date">1</div><div class="cal-date">2</div><div class="cal-date">3</div><div class="cal-date">4</div>
+                            <div class="cal-date">5</div><div class="cal-date">6</div><div class="cal-date">7</div><div class="cal-date">8</div><div class="cal-date">9</div><div class="cal-date">10</div><div class="cal-date">11</div>
+                            <div class="cal-date">12</div><div class="cal-date">13</div><div class="cal-date">14</div><div class="cal-date">15</div><div class="cal-date cal-today">16</div><div class="cal-date">17</div><div class="cal-date">18</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card">
+                    <div class="w-header wh-teal">Classmates</div>
+                    <div class="w-body">
+                        <div style="display:flex; gap:10px; align-items:center; margin-bottom:5px;">
+                            <div style="background:#eee; padding:5px; border-radius:50%;">AP</div>
+                            <div>
+                                <div style="font-weight:bold; font-size:10px;">ABHASH PATEL</div>
+                                <div style="font-size:9px;">KIOTBCA25001</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px; align-items:center;">
+                            <div style="background:#eee; padding:5px; border-radius:50%;">AK</div>
+                            <div>
+                                <div style="font-weight:bold; font-size:10px;">AMAN KUMAR</div>
+                                <div style="font-size:9px;">KIOTBCA25002</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget-card full-width">
+                    <div class="w-header wh-teal">Transport Route</div>
+                    <div class="w-body" style="padding:0;">
+                        <table class="custom-table" style="margin:0;">
+                            <thead>
+                                <tr><th>S.NO.</th><th>HALT POINT</th><th>TIMING</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>1</td><td>RAMA DEVI CHAURAHA</td><td>07:10 AM</td></tr>
+                                <tr><td>2</td><td>SHIV KATRA</td><td>07:15 AM</td></tr>
+                                <tr><td>3</td><td>PHOOL BAGH</td><td>07:25 AM</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div> <div style="text-align:center; padding:20px; color:#aaa; font-size:11px;">
+                Powered by Asteroid365 | Version 4.2
+            </div>
+
+        </div> </div>
+
+    <script>
+        // Load User Data from Login
+        window.onload = function() {
+            const user = localStorage.getItem("loggedInUser");
+            if(user) {
+                document.getElementById("headerName").innerText = user.toUpperCase();
+                document.getElementById("welcomeName").innerText = user.toUpperCase();
+                document.getElementById("profileName").innerText = user.toUpperCase();
+            }
+        };
+        // --- ADMIN CONTROL BRIDGE (Paste this inside window.onload in main_portal.html) ---
+
+const config = JSON.parse(localStorage.getItem("systemConfig"));
+
+if (config) {
+    // 1. Maintenance Mode Check
+    if (config.maintenance === true) {
+        document.body.innerHTML = "<h1 style='color:red; text-align:center; margin-top:20%'>🚧 SITE UNDER MAINTENANCE 🚧<br><span style='font-size:15px; color:black;'>Please contact Admin.</span></h1>";
+        return; // Stop loading rest of the page
+    }
+
+    // 2. Hide Result Section if Admin Disabled it
+    if (config.showResults === false) {
+        // Sidebar me se Result chupao
+        // Note: Aapko HTML me result wale <div> ko id deni hogi, e.g., id="menuResult"
+        const resultSection = document.getElementById("results"); // Main content
+        if(resultSection) resultSection.innerHTML = "<h2 style='color:red; padding:20px;'>Results are currently hidden by Admin.</h2>";
+    }
+
+    // 3. Show Global Message
+    if (config.message && config.message !== "") {
+        // Header ke niche ek alert bar add kar do
+        const msgBar = document.createElement("div");
+        msgBar.style.cssText = "background: #ffeb3b; color: #333; padding: 10px; text-align: center; font-weight: bold;";
+        msgBar.innerHTML = "<i class='fas fa-bullhorn'></i> NOTICE: " + config.message;
+        document.querySelector(".main-content").prepend(msgBar);
+    }
+}
+    </script>
+
+</body>
+</html>

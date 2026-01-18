@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>God Mode | Super Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg-dark: #1e1e2f; --panel-bg: #27293d; --accent: #e14eca; --danger: #ff3d71; --success: #00f2c3; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: var(--bg-dark); color: #fff; display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 260px; background: #1a1a25; padding: 20px; display: flex; flex-direction: column; border-right: 1px solid #333; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: var(--accent); margin-bottom: 40px; text-align: center; }
+        .menu-item { padding: 15px; margin-bottom: 5px; cursor: pointer; border-radius: 5px; color: #a9a9b3; }
+        .menu-item:hover, .menu-item.active { background: var(--accent); color: white; }
+        .main { flex: 1; padding: 30px; overflow-y: auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .card { background: var(--panel-bg); padding: 25px; border-radius: 10px; position: relative; }
+        .control-panel { background: var(--panel-bg); padding: 25px; border-radius: 10px; margin-bottom: 30px; border: 1px solid #333; }
+        .panel-title { font-size: 1.1rem; margin-bottom: 20px; border-bottom: 1px solid #444; padding-bottom: 10px; color: var(--accent); }
+        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; }
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #444; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--success); }
+        input:checked + .slider:before { transform: translateX(24px); }
+        .danger-switch input:checked + .slider { background-color: var(--danger); }
+        .input-box { width: 100%; padding: 10px; background: #1a1a25; border: 1px solid #444; color: #fff; border-radius: 5px; }
+        .btn-save { background: var(--accent); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: bold; }
+        #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 2px; padding: 16px; position: fixed; z-index: 1; left: 50%; bottom: 30px; transform: translateX(-50%); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+    </style>
+</head>
+<body onload="initGodMode()">
+    <div class="sidebar">
+        <div class="logo">SUPER ADMIN</div>
+        <div class="menu-item active"><i class="fas fa-desktop"></i> Main Console</div>
+        <div class="menu-item" onclick="location.href='database_editor.html'"><i class="fas fa-edit"></i> Edit Database</div>
+        <div class="menu-item" onclick="location.href='student_login.html'"><i class="fas fa-eye"></i> View Site</div>
+    </div>
+
+    <div class="main">
+        <div class="grid">
+            <div class="card">
+                <h3 id="stuCount">0</h3> <p>Students</p>
+            </div>
+            <div class="card">
+                <h3 id="empCount">0</h3> <p>Faculty</p>
+            </div>
+            <div class="card">
+                <h3 style="color:var(--success);">LIVE</h3> <p>MySQL Connection</p>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="panel-title">System Controls</div>
+            
+            <div class="switch-row">
+                <div class="switch-label"><h4>Exam Results</h4><p>Show/Hide Results tab</p></div>
+                <label class="switch"><input type="checkbox" id="toggleResults" onchange="saveConfig()"><span class="slider"></span></label>
+            </div>
+            <div class="switch-row">
+                <div class="switch-label"><h4>New Registrations</h4><p>Allow new signups</p></div>
+                <label class="switch"><input type="checkbox" id="toggleReg" onchange="saveConfig()"><span class="slider"></span></label>
+            </div>
+            <div class="switch-row" style="border: 1px solid var(--danger);">
+                <div class="switch-label"><h4 style="color:var(--danger);">Maintenance Mode</h4><p>Block all access</p></div>
+                <label class="switch danger-switch"><input type="checkbox" id="maintenanceMode" onchange="saveConfig()"><span class="slider"></span></label>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="panel-title">Broadcast Message</div>
+            <textarea id="globalMsg" class="input-box" rows="3" placeholder="Notice for all students..."></textarea>
+            <button class="btn-save" onclick="saveConfig()">PUBLISH NOTICE</button>
+        </div>
+    </div>
+
+    <div id="toast">Settings Updated!</div>
+
+    <script>
+        function initGodMode() {
+            loadStats();
+            loadSettings();
+        }
+
+        function loadStats() {
+            fetch('http://localhost:5000/api?type=student').then(r=>r.json()).then(d=>document.getElementById("stuCount").innerText=d.length);
+            fetch('http://localhost:5000/api?type=employee').then(r=>r.json()).then(d=>document.getElementById("empCount").innerText=d.length);
+        }
+
+        function loadSettings() {
+            fetch('http://localhost:5000/api/config')
+            .then(res => res.json())
+            .then(config => {
+                document.getElementById("toggleResults").checked = config.showResults;
+                document.getElementById("toggleReg").checked = config.allowReg;
+                document.getElementById("maintenanceMode").checked = config.maintenance;
+                document.getElementById("globalMsg").value = config.message || "";
+            });
+        }
+
+        function saveConfig() {
+            const config = {
+                showResults: document.getElementById("toggleResults").checked,
+                showFees: true, 
+                allowReg: document.getElementById("toggleReg").checked,
+                maintenance: document.getElementById("maintenanceMode").checked,
+                message: document.getElementById("globalMsg").value
+            };
+            fetch('http://localhost:5000/api/config/update', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config)
+            }).then(r => {
+                const x = document.getElementById("toast"); x.className = "show"; setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);
+            });
+        }
+    </script>
+</body>
+</html>

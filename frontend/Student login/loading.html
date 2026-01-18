@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preparing Dashboard...</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. BLUE SCREEN SETUP --- */
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            
+            /* The Exact Blue Color from Screenshot */
+            background-color: #2196f3; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        /* --- 2. ICON ANIMATION --- */
+        .icon-container {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        /* Dheere se upar-niche hone wala effect */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Icon Colors to match image */
+        .icon-chart { color: #ffeb3b; } /* Yellow part */
+        .icon-graph { color: #ff5252; } /* Red part */
+
+        /* --- 3. TEXT STYLING --- */
+        .loading-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 25px;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        /* --- 4. PROGRESS BAR DESIGN --- */
+        .progress-container {
+            width: 300px; /* Bar ki lambai */
+            height: 6px;  /* Bar ki motai */
+            background: rgba(255, 255, 255, 0.3); /* Halka white background */
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #fff; /* White filling color */
+            width: 0%;
+            border-radius: 10px;
+            /* Animation: 3 second mein poora bharega */
+            animation: fillBar 3s linear forwards; 
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes fillBar {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="icon-container">
+        <span class="fa-stack">
+            <i class="fas fa-chart-pie fa-stack-1x icon-chart" style="transform: translate(-10px, 10px);"></i>
+            <i class="fas fa-chart-bar fa-stack-1x icon-graph" style="transform: translate(10px, -5px);"></i>
+        </span>
+    </div>
+
+    <div class="loading-text">Preparing your dashboard, Please wait...</div>
+
+    <div class="progress-container">
+        <div class="progress-fill"></div>
+    </div>
+
+    <script>
+        // --- AUTO REDIRECT LOGIC ---
+        // 3.5 Seconds (3500ms) ke baad agle page par bhej dega
+        setTimeout(function() {
+            // Yahan 'main_portal.html' woh page hoga jo dashboard khulne par dikhega
+            window.location.href = "main_portal.html"; 
+        }, 3500);
+    </script>
+
+</body>
+</html>

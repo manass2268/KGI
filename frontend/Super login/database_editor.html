@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Database | MySQL Connected</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- THEME --- */
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; color: #333; }
+        .header { background: #fff; padding: 15px 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .back-btn { text-decoration: none; color: #555; font-weight: bold; }
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { padding: 10px 20px; border: none; background: #ddd; cursor: pointer; border-radius: 5px; font-weight: bold; color: #555; }
+        .tab-btn.active { background: #1a3c6e; color: #fff; }
+        .db-view { display: none; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .db-view.active { display: block; }
+        .toolbar { display: flex; justify-content: flex-end; margin-bottom: 15px; }
+        .add-btn { background: #2ecc71; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: #2c3e50; color: #fff; padding: 12px; text-align: left; }
+        td { padding: 10px; border-bottom: 1px solid #eee; text-transform: uppercase; }
+        tr:hover { background: #f9f9f9; }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); justify-content: center; align-items: center; z-index: 999; }
+        .modal-box { background: #fff; padding: 25px; width: 500px; border-radius: 8px; max-height: 90vh; overflow-y: auto; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .full-width { grid-column: span 2; }
+        label { display: block; font-size: 0.8rem; font-weight: bold; margin-bottom: 4px; color: #555; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; text-transform: uppercase; }
+        .save-btn { width: 100%; padding: 12px; background: #1a3c6e; color: #fff; border: none; cursor: pointer; font-weight: bold; margin-top: 15px; }
+        .close-btn { float: right; cursor: pointer; font-size: 1.5rem; margin-top: -10px; }
+        .act-btn { cursor: pointer; margin-right: 8px; font-size: 1rem; }
+        .edit-icon { color: #f39c12; } .del-icon { color: #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2><i class="fas fa-database"></i> MySQL Database Manager</h2>
+        <a href="super_admin.html" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('student')">STUDENT DATA</button>
+        <button class="tab-btn" onclick="switchTab('employee')">EMPLOYEE DATA</button>
+    </div>
+
+    <div id="studentView" class="db-view active">
+        <div class="toolbar"><button class="add-btn" onclick="openModal('student')"><i class="fas fa-plus"></i> NEW ADMISSION</button></div>
+        <table>
+            <thead><tr><th>Roll No</th><th>Name</th><th>Course/Branch</th><th>Sem</th><th>Password</th><th>Action</th></tr></thead>
+            <tbody id="studentBody"></tbody>
+        </table>
+    </div>
+
+    <div id="employeeView" class="db-view">
+        <div class="toolbar"><button class="add-btn" onclick="openModal('employee')"><i class="fas fa-plus"></i> NEW FACULTY</button></div>
+        <table>
+            <thead><tr><th>Emp ID</th><th>Name</th><th>Designation</th><th>Dept</th><th>Password</th><th>Action</th></tr></thead>
+            <tbody id="employeeBody"></tbody>
+        </table>
+    </div>
+
+    <div id="entryModal" class="modal">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle" style="margin-bottom:20px; border-bottom:2px solid #ddd; padding-bottom:10px;">Add Record</h3>
+            
+            <form onsubmit="saveData(event)">
+                <input type="hidden" id="entryType">
+                <input type="hidden" id="editMode">
+                <input type="hidden" id="oldId">
+
+                <div class="form-grid">
+                    <div class="full-width">
+                        <label>FULL NAME</label>
+                        <input type="text" id="inpName" required placeholder="e.g. ROHAN VERMA">
+                    </div>
+                    <div>
+                        <label id="lblId">ROLL NO / ID</label>
+                        <input type="text" id="inpId" required placeholder="e.g. KGI123" oninput="autoSyncPassword()">
+                    </div>
+                    <div>
+                        <label>PASSWORD (Auto-Set)</label>
+                        <input type="text" id="inpPass" required readonly style="background:#eee; color:#555;">
+                    </div>
+                    <div>
+                        <label>MOBILE NO</label>
+                        <input type="text" id="inpMobile" placeholder="9876543210">
+                    </div>
+
+                    <div class="stu-field">
+                        <label>COURSE</label>
+                        <select id="inpCourse" onchange="updateBranchOptions()">
+                            <option value="">--SELECT--</option>
+                            <option value="B.TECH">B.TECH</option>
+                            <option value="BCA">BCA</option>
+                            <option value="MBA">MBA</option>
+                            <option value="DIPLOMA">DIPLOMA</option>
+                        </select>
+                    </div>
+                    <div class="stu-field">
+                        <label>BRANCH</label>
+                        <select id="inpBranch">
+                            <option value="">--SELECT COURSE FIRST--</option>
+                        </select>
+                    </div>
+                    <div class="stu-field">
+                        <label>SEMESTER</label>
+                        <select id="inpSem">
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                        </select>
+                    </div>
+                    <div class="stu-field">
+                        <label>SECTION</label>
+                        <select id="inpSec"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+                    </div>
+
+                    <div class="emp-field" style="display:none;">
+                        <label>DESIGNATION</label>
+                        <select id="inpDesig"><option value="PROFESSOR">PROFESSOR</option><option value="ASST. PROFESSOR">ASST. PROFESSOR</option><option value="HOD">HOD</option></select>
+                    </div>
+                    <div class="emp-field" style="display:none;">
+                        <label>DEPARTMENT</label>
+                        <select id="inpDept"><option value="CSE">CSE</option><option value="ME">ME</option><option value="ADMIN">ADMIN</option></select>
+                    </div>
+                </div>
+                <button type="submit" class="save-btn">SAVE TO MYSQL DATABASE</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global Data Store
+        let currentStudentData = [];
+        let currentEmployeeData = [];
+
+        // --- 1. INITIALIZE ---
+        window.onload = function() {
+            renderTable('student');
+            renderTable('employee');
+        };
+
+        // --- 2. OPEN MODAL (FIXED: Hidden inputs safe) ---
+        function openModal(type) {
+            document.getElementById('entryModal').style.display = 'flex';
+            
+            // Fix: Clear ONLY visible inputs, NOT hidden ones
+            document.querySelectorAll('input').forEach(i => {
+                if(i.type !== 'hidden') {
+                    i.value = "";
+                }
+            });
+            
+            // Reset Dropdowns
+            document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+
+            // Set Hidden Values Correctly
+            document.getElementById('entryType').value = type;
+            document.getElementById('editMode').value = "false";
+            document.getElementById('modalTitle').innerText = type === 'student' ? "NEW ADMISSION" : "NEW FACULTY";
+            
+            toggleFields(type);
+        }
+
+        // --- 3. SAVE DATA (POST TO PYTHON) ---
+        function saveData(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('entryType').value;
+            const isEdit = document.getElementById('editMode').value === "true";
+            const oldId = document.getElementById('oldId').value;
+            
+            // Debugging check
+            if(!type) { alert("Error: Form Type Missing. Refresh Page."); return; }
+
+            const formData = {
+                type: type,
+                isEdit: isEdit,
+                oldId: oldId,
+                name: document.getElementById('inpName').value.toUpperCase(),
+                id: document.getElementById('inpId').value.toUpperCase(),
+                pass: document.getElementById('inpPass').value,
+                mobile: document.getElementById('inpMobile').value
+            };
+
+            if(type === 'student') {
+                formData.course = document.getElementById('inpCourse').value;
+                formData.branch = document.getElementById('inpBranch').value;
+                formData.sem = document.getElementById('inpSem').value;
+                formData.sec = document.getElementById('inpSec').value;
+            } else {
+                formData.desig = document.getElementById('inpDesig').value;
+                formData.dept = document.getElementById('inpDept').value;
+            }
+
+            fetch('http://localhost:5000/api/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === 'success') {
+                    closeModal();
+                    renderTable(type);
+                    alert("Data Saved Successfully to MySQL!");
+                } else {
+                    alert("Database Error: " + response.message);
+                }
+            })
+            .catch(err => alert("Server Error: Ensure Python app.py is running."));
+        }
+
+        // --- 4. RENDER TABLES ---
+        function renderTable(type) {
+            const tbodyId = type + 'Body';
+            const tbody = document.getElementById(tbodyId);
+
+            if (!tbody) { console.error(`Missing ID: ${tbodyId}`); return; }
+
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>`;
+
+            fetch(`http://localhost:5000/api?type=${type}`)
+            .then(res => res.json())
+            .then(data => {
+                if (type === 'student') currentStudentData = data;
+                else currentEmployeeData = data;
+
+                tbody.innerHTML = "";
+                
+                if(data.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">NO DATA IN MYSQL</td></tr>`;
+                    return;
+                }
+
+                data.forEach(u => {
+                    let userId = type === 'student' ? u.roll_no : u.emp_id;
+                    let extra = type === 'student' 
+                        ? `<td>${u.course}/${u.branch}</td><td>${u.semester} (${u.section})</td>` 
+                        : `<td>${u.designation}</td><td>${u.department}</td>`;
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${userId}</b></td>
+                            <td>${u.name}</td>
+                            ${extra}
+                            <td style="font-family:monospace; color:#aaa;">${u.password}</td>
+                            <td>
+                                <i class="fas fa-edit act-btn edit-icon" onclick="editUser('${type}', '${userId}')"></i>
+                                <i class="fas fa-trash-alt act-btn del-icon" onclick="deleteUser('${type}', '${userId}')"></i>
+                            </td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(err => {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Connection Failed</td></tr>`;
+            });
+        }
+
+        // --- 5. UTILS ---
+        function editUser(type, id) {
+            const data = type === 'student' ? currentStudentData : currentEmployeeData;
+            const u = data.find(user => (type === 'student' ? user.roll_no : user.emp_id) === id);
+
+            if(u) {
+                // Open Modal first
+                openModal(type);
+                
+                // Then Overwrite values
+                document.getElementById('editMode').value = "true";
+                document.getElementById('oldId').value = id;
+                document.getElementById('modalTitle').innerText = "EDIT DETAILS";
+
+                document.getElementById('inpName').value = u.name;
+                document.getElementById('inpId').value = id;
+                document.getElementById('inpPass').value = u.password;
+                document.getElementById('inpMobile').value = u.mobile;
+
+                if(type === 'student') {
+                    document.getElementById('inpCourse').value = u.course;
+                    updateBranchOptions();
+                    document.getElementById('inpBranch').value = u.branch;
+                    document.getElementById('inpSem').value = u.semester;
+                    document.getElementById('inpSec').value = u.section;
+                } else {
+                    document.getElementById('inpDesig').value = u.designation;
+                    document.getElementById('inpDept').value = u.department;
+                }
+            }
+        }
+
+        function deleteUser(type, id) {
+            if(!confirm("Delete this record permanently?")) return;
+
+            fetch('http://localhost:5000/api/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type: type, id: id })
+            })
+            .then(res => res.json())
+            .then(response => {
+                if(response.status === 'success') renderTable(type);
+                else alert("Error: " + response.message);
+            });
+        }
+
+        function updateBranchOptions() {
+            const course = document.getElementById("inpCourse").value;
+            const branchSelect = document.getElementById("inpBranch");
+            branchSelect.innerHTML = "";
+            let options = [];
+
+            if(course === "B.TECH" || course === "DIPLOMA") options = ["CSE", "AIML", "ME", "CE", "EE", "EC"];
+            else if(course === "BCA") options = ["BCA_GEN", "BCA_DS"];
+            else if(course === "MBA") options = ["HR", "FINANCE", "MARKETING", "IT"];
+            else options = ["--SELECT COURSE FIRST--"];
+
+            options.forEach(opt => {
+                let el = document.createElement("option"); el.textContent = opt; el.value = opt;
+                branchSelect.appendChild(el);
+            });
+        }
+
+        function autoSyncPassword() {
+            document.getElementById("inpPass").value = document.getElementById("inpId").value.toUpperCase();
+        }
+
+        function toggleFields(type) {
+            const stu = document.querySelectorAll('.stu-field'), emp = document.querySelectorAll('.emp-field');
+            if(type==='student'){ stu.forEach(f=>f.style.display='block'); emp.forEach(f=>f.style.display='none'); }
+            else { stu.forEach(f=>f.style.display='none'); emp.forEach(f=>f.style.display='block'); }
+        }
+
+        function closeModal() { document.getElementById('entryModal').style.display = 'none'; }
+        
+        function switchTab(type) { 
+            document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active');
+            document.querySelectorAll('.db-view').forEach(v=>v.classList.remove('active')); document.getElementById(type+'View').classList.add('active');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KGI ERP Portal</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- 1. GLOBAL & FONTS --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            /* Original jaisa Green Overlay + Background Image */
+            background: linear-gradient(rgba(46, 125, 90, 0.8), rgba(46, 125, 90, 0.6)), 
+                        url('intitue1.jpeg');
+            background-size: cover;
+            background-position: center;
+            height: 100vh; /* Pura Screen Height Cover karega */
+            width: 100vw;
+            overflow-x: hidden; /* Side scroll band */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 2. TOP NAVIGATION BAR --- */
+        .navbar {
+            background: rgba(0, 0, 0, 0.25); /* Thoda dark transparent */
+            padding: 48px 10px;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            position: absolute;
+            top: 10;
+            z-index: 00;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            margin-right: 35px; /* Links ke beech zyada gap */
+            font-size: 15px; /* Font size original jaisa */
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .navbar a:hover {
+            color: #ddd;
+        }
+
+        /* --- 3. MAIN CENTER CONTENT --- */
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-top: 60px; /* Navbar ke liye jagah */
+        }
+
+        /* LOGO SECTION */
+        .logo-section {
+            margin-bottom: 0px;
+            text-align: center;
+
+        }
+        
+        /* Note: Original logo image lagane ke liye yahan img tag use karein */
+        .logo-text {
+            
+            font-size: 2%; /* Bada Logo Text */
+            font-weight: 100;
+            text-transform: uppercase;
+             
+        }
+
+        /* --- 4. CARDS CONTAINER (Bada aur faila hua) --- */
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px; /* Cards ke beech ka gap */
+            width: 100%;
+            max-width: 1400px; /* Zyada wide area */
+            padding: 0 20px;
+        }
+        .ip-section {
+            margin-top: 35px;
+            font-size: 1.9rem;
+            color: #f8f8f8;
+            background-color: #ff0606;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .info-section {
+            margin-top: 35px;
+            font-size: 1.9rem;
+            color: #f8f8f8;
+            background-color: #06ff8f;
+            padding: 8px 12px;
+            border-radius: 5px;
+            text-align: center;
+        
+        }
+        /* INDIVIDUAL CARD DESIGN */
+        .card {
+            background: #fff;
+            width: 190px;  /* Original width */
+            height: 210px; /* Original height */
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+            padding: 15px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Images inside cards (Cartoons) */
+        .card img {
+            width: 90px; /* Image ka size bada kiya */
+            height: 90px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+        .card-text {
+            color: #2c3e50; /* Dark Blue/Grey text */
+            font-size: 18px; /* Bada Font Size */
+            font-weight: 500;
+            text-align: center;
+        }
+
+        /* --- 5. BOTTOM TEXT --- */
+        .welcome-msg {
+            text-align: center;
+            color: #fff;
+            margin-top: 60px;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
+        }
+        
+        .welcome-msg h2 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .welcome-msg p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* --- 6. FLOATING BUTTONS (Left & Right) --- */
+        .float-btn {
+            position: fixed;
+            bottom: 25px;
+            background: #fff;
+            padding: 12px 25px;
+            border-radius: 50px; /* Capsule shape */
+            text-decoration: none;
+            color: #333;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 99;
+        }
+
+        .btn-left { left: 30px; }
+        .btn-right { right: 30px; }
+
+        /* Icon colors */
+        .icon-android { color: #76ff03; font-size: 1.4rem; }
+        .icon-form { color: #fbc02d; font-size: 1.4rem; }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            .navbar { flex-wrap: wrap; justify-content: center; padding: 10px; }
+            .navbar a { margin: 5px 10px; font-size: 13px; }
+            .cards-container { gap: 15px; }
+            .card { width: 45%; height: 180px; } /* Mobile pe 2 line mein */
+            .float-btn { padding: 10px 15px; font-size: 12px; bottom: 10px; }
+            .logo-text { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html">Home</a>
+        <a href="https://bharateducation.org/details.php?view_id=7569">Krishna Institute Of Technology</a>
+        <a href="index.html">Contact Us</a>
+        <a href="index.html">Client Area</a>
+        <a href="index.html">Privacy Policy</a>
+    </nav>
+
+    <div class="content-wrapper">
+        
+        <div class="logo-section">
+            <div class="logo-text">
+                <img src="logo.png" alt="KGI Logo" class="logo-image" style="width: 320px; height: auto;">
+            </div>
+        </div>
+
+        <div class="cards-container">
+            
+            <a href="/frontend/Student login/student_login.html" class="card">
+                <img src="https://cdn-icons-png.flaticon.com/512/3429/3429402.png" alt="Student">
+                <div class="card-text">Students Login</div>
+            </a>
+
+            <a href="/frontend/Employee login/employee_login.html" class="card">
+                <img src="https://cdn-icons-png.flaticon.com/512/3220/3220121.png" alt="Employee">
+                <div class="card-text">Employees Login</div>
+            </a>
+
+            <a href="#" class="card">
+                <img src="https://cdn-icons-png.flaticon.com/512/2910/2910791.png" alt="Career">
+                <div class="card-text">Career</div>
+            </a>
+
+            <a href="/frontend/Super login/super_login.html" class="card">
+                <img src="https://cdn-icons-png.flaticon.com/512/1754/1754452.png" alt="Admin">
+                <div class="card-text">Super Login</div>
+            </a>
+
+            <a href="#" class="card">
+                <img src="https://cdn-icons-png.flaticon.com/512/2995/2995620.png" alt="Exam">
+                <div class="card-text">Online Exam</div>
+            </a>
+
+        </div>
+        <div class="info-section">
+                <div id="liveTime" style="font-size: 1.1rem; color: #1b2a4e; font-weight: 600; margin-top: 6px;"></div>
+            </div>
+            <div class="ip-section">
+                <span>Caution:</span>
+                Your IP address <span id="ipAddress">Detecting...</span> is being monitored for security purpose.
+                <br> Please do not share your login credentials with anyone.
+
+            </div>
+            >
+
+        <div class="welcome-msg">
+            <p>Welcome To</p>
+            <h2>Krishna Group of Institutions (KGI)</h2>
+            <p style="margin-top: 15px; font-size: 0.9rem; font-weight: 500;">
+                Intelligent Institute Automation System (IERP)
+            </p>
+        </div>
+    </div>
+
+    <a href="#" class="float-btn btn-left">
+        Android App <i class="fab fa-android icon-android"></i>
+    </a>
+
+    <a href="#" class="float-btn btn-right">
+        <i class="fas fa-file-alt icon-form"></i> Admission Enquiry
+    </a>
+<script>
+    // Function to update live time every second
+    function updateTime() {
+        const now = new Date();
+        const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', year: 'numeric', month: 'long', day: 'numeric' };
+        const timeString = now.toLocaleDateString('en-US', options);
+        document.getElementById('liveTime').innerText = timeString;
+    }
+    setInterval(updateTime, 1000); // Update every second
+    updateTime(); // Initial call
+    // Function to fetch and display IP address
+    async function fetchIPAddress() {
+        try {
+            const response = await fetch('https://api.ipify.org?format=json');
+            const data = await response.json();
+            document.getElementById('ipAddress').innerText = data.ip;
+        } catch (error) {
+            document.getElementById('ipAddress').innerText = 'Unable to fetch IP';
+        }
+    }
+    fetchIPAddress(); // Initial call
+    setInterval(fetchIPAddress, 60000); // Update every minute
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Login | KGI ERP</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- THEME: FACULTY (Red/Dark) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: #f8f9fa; background-image: radial-gradient(#d32f2f 0.5px, transparent 0.5px); background-size: 20px 20px; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        
+        .login-box { background: #fff; width: 90%; max-width: 450px; padding: 40px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 5px solid #d32f2f; text-align: center; }
+        .logo h1 { color: #d32f2f; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
+        .logo p { color: #666; font-size: 0.9rem; margin-bottom: 30px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .input-group { text-align: left; margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: bold; font-size: 0.85rem; color: #333; margin-bottom: 5px; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; transition: 0.3s; }
+        .form-control:focus { border-color: #d32f2f; outline: none; }
+
+        .btn-login { width: 100%; padding: 12px; background: #d32f2f; color: white; border: none; font-weight: bold; font-size: 1rem; border-radius: 4px; cursor: pointer; transition: 0.3s; }
+        .btn-login:hover { background: #b71c1c; }
+        .btn-login:disabled { background: #ccc; }
+
+        .error-msg { color: white; background: #e74c3c; padding: 10px; border-radius: 4px; margin-bottom: 20px; display: none; font-size: 0.9rem; }
+        
+        /* Modal for Password Change */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); justify-content: center; align-items: center; }
+        .modal-box { background: #fff; padding: 30px; width: 400px; border-radius: 8px; text-align: center; }
+    </style>
+</head>
+<body onload="checkSystem()">
+
+    <div class="login-box">
+        <div class="logo">
+           <img src="../logo.png" alt="KGI Logo" class="logo-image" style="width: 150px; height: auto; margin-bottom: 15px;">
+            <p>Faculty & Staff Portal</p>
+        </div>
+
+        <div id="loginError" class="error-msg">Invalid Credentials!</div>
+
+        <form onsubmit="handleLogin(event)">
+            <div class="input-group">
+                <label>EMPLOYEE ID</label>
+                <input type="text" id="empId" class="form-control" placeholder="e.g. EMP001" required oninput="this.value=this.value.toUpperCase()">
+            </div>
+            <div class="input-group">
+                <label>PASSWORD</label>
+                <input type="password" id="empPass" class="form-control" placeholder="Enter Password" required>
+            </div>
+            <button type="submit" id="loginBtn" class="btn-login">SECURE LOGIN</button>
+        </form>
+        
+        
+    </div>
+
+    <div id="pwdModal" class="modal">
+        <div class="modal-box">
+            <h3 style="color:#d32f2f; margin-bottom:15px;">Set New Password</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:20px;">First time login requires a secure password.</p>
+            <input type="password" id="newPass" class="form-control" placeholder="New Password" style="margin-bottom:10px;">
+            <button onclick="updatePassword()" class="btn-login">UPDATE & CONTINUE</button>
+        </div>
+    </div>
+
+    <script>
+        let tempUser = null;
+
+        // 1. CHECK MAINTENANCE MODE
+        function checkSystem() {
+            fetch('http://localhost:5000/api/config').then(r=>r.json()).then(c => {
+                if(c.maintenance) document.body.innerHTML = "<h1 style='color:#fff; background:#000; padding:20px;'>SYSTEM MAINTENANCE</h1>";
+            });
+        }
+
+        // 2. LOGIN LOGIC
+        function handleLogin(e) {
+            e.preventDefault();
+            const uid = document.getElementById("empId").value.trim().toUpperCase();
+            const pass = document.getElementById("empPass").value.trim();
+            const btn = document.getElementById("loginBtn");
+            const err = document.getElementById("loginError");
+
+            btn.disabled = true; btn.innerText = "VERIFYING...";
+            err.style.display = "none";
+
+            // Fetch Employees from MySQL
+            fetch('http://localhost:5000/api?type=employee')
+            .then(res => res.json())
+            .then(data => {
+                const user = data.find(u => u.emp_id === uid && u.password === pass);
+                
+                if(user) {
+                    // Check First Time Login
+                    if(user.password === user.emp_id) {
+                        tempUser = user;
+                        document.getElementById("pwdModal").style.display = "flex";
+                        btn.disabled = false; btn.innerText = "SECURE LOGIN";
+                    } else {
+                        successLogin(user);
+                    }
+                } else {
+                    err.style.display = "block";
+                    btn.disabled = false; btn.innerText = "SECURE LOGIN";
+                }
+            })
+            .catch(() => { alert("Server Offline"); btn.disabled = false; });
+        }
+
+        // 3. PASSWORD UPDATE
+        function updatePassword() {
+            const p = document.getElementById("newPass").value;
+            if(p.length < 4) return alert("Weak Password");
+
+            const updateData = {
+                type: 'employee', isEdit: true, oldId: tempUser.emp_id,
+                id: tempUser.emp_id, name: tempUser.name, pass: p,
+                mobile: tempUser.mobile, desig: tempUser.designation, dept: tempUser.department
+            };
+
+            fetch('http://localhost:5000/api/save', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(updateData)
+            }).then(r => r.json()).then(res => {
+                if(res.status === 'success') {
+                    tempUser.password = p;
+                    successLogin(tempUser);
+                } else alert("Error updating");
+            });
+        }
+
+        function successLogin(user) {
+            localStorage.setItem("empUser", JSON.stringify(user));
+            window.location.href = "employee_dashboard.html";
+        }
+    </script>
+</body>
+</html>

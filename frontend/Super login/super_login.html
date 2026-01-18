@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Super Login | KGI ERP</title>
+    <style>
+        body { background-color: #2c3e50; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; color: #fff; }
+        .login-card { background: #fff; color: #333; width: 350px; padding: 40px; border-radius: 10px; border-top: 6px solid #d32f2f; text-align: center; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 96%; padding: 12px; background: #d32f2f; color: white; font-weight: bold; border: none; cursor: pointer; border-radius: 4px; margin-top: 10px; }
+        button:hover { background: #b71c1c; }
+    </style>
+</head>
+<body>
+
+    <div class="login-card">
+        <h1 style="margin: 0; color: #d32f2f;">SUPER LOGIN</h1>
+        <p style="font-size: 12px; margin-bottom: 30px;">Authorized Administrators Only</p>
+
+        <form onsubmit="adminLogin(event)">
+            <input type="text" id="adminId" placeholder="Admin Username" required>
+            <input type="password" id="adminPass" placeholder="Secure Password" required>
+            <button type="submit">ACCESS PANEL</button>
+        </form>
+        <p id="alert" style="color: red; font-size: 12px; display: none; margin-top: 10px;">Access Denied!</p>
+    </div>
+
+    <script>
+        // --- 1. SETUP ADMIN DATABASE ---
+        if (!localStorage.getItem("superDB")) {
+            // Default Admin Setup
+            const admins = [{ id: "ADMIN", pass: "admin123", name: "Main Controller" }];
+            localStorage.setItem("superDB", JSON.stringify(admins));
+        }
+
+        // --- 2. ADMIN LOGIN LOGIC ---
+        function adminLogin(e) {
+            e.preventDefault();
+            const id = document.getElementById("adminId").value.trim();
+            const pass = document.getElementById("adminPass").value.trim();
+            const alertBox = document.getElementById("alert");
+
+            // Sirf 'superDB' check karega
+            const db = JSON.parse(localStorage.getItem("superDB"));
+            const admin = db.find(a => a.id === id && a.pass === pass);
+
+            if (admin) {
+                // Admin Dashboard par bhejo (Niche code hai)
+                window.location.href = "admin_dashboard.html";
+            } else {
+                alertBox.style.display = "block";
+            }
+        }
+    </script>
+</body>
+</html>

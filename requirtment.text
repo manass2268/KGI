@@ -1,0 +1,94 @@
+# KGI Student Management System - Setup Guide
+
+## Backend Setup (Python)
+
+### 1. Install Required Packages
+```bash
+pip install flask flask-cors mysql-connector-python
+```
+
+### 2. Database Setup
+Make sure MySQL is running on your system with:
+- Host: localhost
+- User: root
+- Password: (empty/no password)
+
+### 3. Initialize Database & Tables
+Run this in backend folder:
+```bash
+python Main.py
+```
+
+### 4. Add Test Student Data
+You can add students via the API or direct database insert:
+
+**Using API (After starting Flask server):**
+```bash
+curl -X POST http://localhost:5000/api/add_student \
+  -H "Content-Type: application/json" \
+  -d '{
+    "stu_id": "STU001",
+    "first_name": "Raj",
+    "last_name": "Kumar",
+    "password": "test123",
+    "class": "12A",
+    "section": "A",
+    "email": "raj@kgi.com"
+  }'
+```
+
+**Using MySQL Direct:**
+```sql
+USE school_students;
+INSERT INTO students (stu_id, first_name, last_name, password, class, section, email) 
+VALUES ('STU001', 'Raj', 'Kumar', 'test123', '12A', 'A', 'raj@kgi.com');
+```
+
+### 5. Start Flask Server
+```bash
+python app.py
+```
+
+Server will run on: http://localhost:5000
+
+## Frontend Setup
+
+1. Open `frontend/Home.html` in browser
+2. Click on "Students Login"
+3. Use credentials:
+   - User ID: STU001
+   - Password: test123
+   - Captcha: Complete the captcha
+4. Login to Dashboard
+
+## File Structure
+```
+backend/
+  ├── Main.py (Database setup)
+  ├── StudentManagement.py (Additional functions)
+  └── app.py (Flask API server) ← NEW
+
+frontend/
+  ├── Home.html (Home page)
+  ├── student_login.html (Login page - UPDATED)
+  └── dashboard.html (Student dashboard) ← NEW
+```
+
+## API Endpoints
+
+### 1. Student Login
+**POST** `/api/student_login`
+- Body: `{ "user_id": "STU001", "password": "test123" }`
+- Response: `{ "success": true, "student": {...} }`
+
+### 2. Add Student
+**POST** `/api/add_student`
+- Body: Complete student data
+- Response: `{ "success": true, "message": "..." }`
+
+## Troubleshooting
+
+1. **Connection Error**: Make sure Flask server is running on port 5000
+2. **Database Error**: Check MySQL is running and credentials are correct
+3. **CORS Error**: Already handled with flask-cors in app.py
+
