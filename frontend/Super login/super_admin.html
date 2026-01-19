@@ -87,12 +87,12 @@
         }
 
         function loadStats() {
-            fetch('http://localhost:5000/api?type=student').then(r=>r.json()).then(d=>document.getElementById("stuCount").innerText=d.length);
-            fetch('http://localhost:5000/api?type=employee').then(r=>r.json()).then(d=>document.getElementById("empCount").innerText=d.length);
+            fetch('https://kgi-api.onrender.com/api?type=student').then(r=>r.json()).then(d=>document.getElementById("stuCount").innerText=d.length);
+            fetch('https://kgi-api.onrender.com/api?type=employee').then(r=>r.json()).then(d=>document.getElementById("empCount").innerText=d.length);
         }
 
         function loadSettings() {
-            fetch('http://localhost:5000/api/config')
+            fetch('https://kgi-api.onrender.com/api/config')
             .then(res => res.json())
             .then(config => {
                 document.getElementById("toggleResults").checked = config.showResults;
@@ -110,7 +110,7 @@
                 maintenance: document.getElementById("maintenanceMode").checked,
                 message: document.getElementById("globalMsg").value
             };
-            fetch('http://localhost:5000/api/config/update', {
+            fetch('https://kgi-api.onrender.com/api/config/update', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(config)
             }).then(r => {
                 const x = document.getElementById("toast"); x.className = "show"; setTimeout(() => { x.className = x.className.replace("show", ""); }, 3000);

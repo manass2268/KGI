@@ -105,7 +105,7 @@
         /* --- HERO --- */
         .hero {
             height: 85vh;
-            background: linear-gradient(rgba(0, 33, 71, 0.7), rgba(0, 33, 71, 0.5)), url('intitue1.jpeg');
+            background: linear-gradient(rgba(0, 33, 71, 0.7), rgba(0, 33, 71, 0.5)), url('/frontend/intitue1.jpeg');
             background-size: cover; background-position: center; background-attachment: fixed;
             display: flex; align-items: center; justify-content: center; text-align: center; color: var(--white);
         }
@@ -212,12 +212,12 @@
 
     <header>
         <div class="logo">
-            <img src="logo.png" alt="KGI Logo" style="height:50px;">
+            <img src="frontend/logo.png" alt="KGI Logo" style="height:50px;">
             
         </div>
 
         <ul class="nav-menu">
-            <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+            <li class="nav-item"><a href="frontend/Home.html" class="nav-link">Home</a></li>
 
             <li class="nav-item">
                 <span class="nav-link">About Us <i class="fas fa-chevron-down"></i></span>
@@ -606,7 +606,7 @@
                 address: document.getElementById('admAddress').value
             };
 
-            fetch('http://localhost:5000/api/admission/apply', {
+            fetch('https://kgi-api.onrender.com/api/admission/apply', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
@@ -630,7 +630,7 @@
 
         // --- MAINTENANCE CHECK ---
         function checkSystem() {
-            fetch('http://localhost:5000/api/config').then(r=>r.json()).then(c => {
+            fetch('https://kgi-api.onrender.com/api/config').then(r=>r.json()).then(c => {
                 if(c.maintenance) {
                     const b = document.getElementById("maintBanner");
                     b.style.display = "block";

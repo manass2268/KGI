@@ -197,7 +197,7 @@
                 formData.dept = document.getElementById('inpDept').value;
             }
 
-            fetch('http://localhost:5000/api/save', {
+            fetch('https://kgi-api.onrender.com/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData)
@@ -224,7 +224,7 @@
 
             tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>`;
 
-            fetch(`http://localhost:5000/api?type=${type}`)
+            fetch(`https://kgi-api.onrender.com/api?type=${type}`)
             .then(res => res.json())
             .then(data => {
                 if (type === 'student') currentStudentData = data;
@@ -297,7 +297,7 @@
         function deleteUser(type, id) {
             if(!confirm("Delete this record permanently?")) return;
 
-            fetch('http://localhost:5000/api/delete', {
+            fetch('https://kgi-api.onrender.com/api/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ type: type, id: id })

@@ -120,7 +120,7 @@
 
         // FETCH STUDENTS FROM MYSQL
         function loadStudents() {
-            fetch('http://localhost:5000/api?type=student')
+            fetch('https://kgi-api.onrender.com/api?type=student')
             .then(res => res.json())
             .then(data => {
                 document.getElementById("totalStu").innerText = data.length;
@@ -143,7 +143,7 @@
 
         // LOAD ADMIN NOTICE
         function loadConfig() {
-            fetch('http://localhost:5000/api/config').then(r=>r.json()).then(c => {
+            fetch('https://kgi-api.onrender.com/api/config').then(r=>r.json()).then(c => {
                 if(c.message) document.getElementById("adminMsg").innerText = c.message;
                 if(c.maintenance) { alert("System Maintenance Started!"); logout(); }
             });

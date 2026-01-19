@@ -273,7 +273,7 @@
 
         // --- LIVE SYNC WITH ADMIN ---
         function checkSystemStatus() {
-            fetch('http://localhost:5000/api/config')
+            fetch('https://kgi-api.onrender.com/api/config')
             .then(res => res.json())
             .then(config => {
                 // Live Maintenance Check

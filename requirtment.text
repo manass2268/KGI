@@ -92,3 +92,7 @@ frontend/
 2. **Database Error**: Check MySQL is running and credentials are correct
 3. **CORS Error**: Already handled with flask-cors in app.py
 
+flask
+flask-cors
+mysql-connector-python
+gunicorn

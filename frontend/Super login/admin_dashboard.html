@@ -206,7 +206,7 @@
 
         // --- 2. LOAD ADMISSIONS (NEW) ---
         function loadAdmissions() {
-            fetch('http://localhost:5000/api/admissions')
+            fetch('https://kgi-api.onrender.com/api/admissions')
             .then(res => res.json())
             .then(data => {
                 const tbody = document.getElementById("admissionTableBody");
@@ -240,7 +240,7 @@
 
         function deleteAdmission(id) {
             if(confirm("Permanently delete this application?")) {
-                fetch('http://localhost:5000/api/admission/delete', {
+                fetch('https://kgi-api.onrender.com/api/admission/delete', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id: id })
@@ -251,7 +251,7 @@
         // --- 3. FETCH DB STATS ---
         function loadDatabaseStats() {
             // Students
-            fetch('http://localhost:5000/api?type=student')
+            fetch('https://kgi-api.onrender.com/api?type=student')
             .then(res => res.json())
             .then(data => {
                 document.getElementById("stuCount").innerText = data.length;
@@ -263,7 +263,7 @@
             });
 
             // Faculty
-            fetch('http://localhost:5000/api?type=employee')
+            fetch('https://kgi-api.onrender.com/api?type=employee')
             .then(res => res.json())
             .then(data => {
                 document.getElementById("empCount").innerText = data.length;
@@ -277,7 +277,7 @@
 
         // --- 4. LOAD SETTINGS ---
         function loadSettings() {
-            fetch('http://localhost:5000/api/config')
+            fetch('https://kgi-api.onrender.com/api/config')
             .then(res => res.json())
             .then(config => {
                 document.getElementById("toggleResults").checked = config.showResults;
@@ -298,7 +298,7 @@
                 message: document.getElementById("globalMsg").value
             };
             
-            fetch('http://localhost:5000/api/config/update', {
+            fetch('https://kgi-api.onrender.com/api/config/update', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(config)

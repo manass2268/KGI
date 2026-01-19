@@ -1,28 +1,45 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import mysql.connector
 import datetime
+  # To check for SSL certificate file
 
 app = Flask(__name__)
 CORS(app)
 
-# --- CONFIGURATION ---
-DB_HOST = "localhost"
-DB_USER = "root"
-DB_PASS = ""      # XAMPP default (empty). Agar password set kiya hai to yahan likhein.
-DB_NAME = "kgi_erp"
+# --- AIVEN CLOUD CONFIGURATION ---
+# Yahan apni Aiven details bharein
+DB_HOST = "kgi-erp-db-kgikanpur.i.aivencloud.com"  # Aiven Host Address
+DB_PORT = 28446                                  # Aiven Port (Number only)
+DB_USER = "avnadmin"                             # Aiven User
+DB_PASS = os.getenv("DB_PASS")             # Aiven Password
+DB_NAME = "defaultdb"                            # Aiven Database Name
+SSL_CERT = "C:\Users\manas\OneDrive\Desktop\School Managemnt  (KGI)\\backend\ca certificate.pem"                              # CA Certificate File Name
 
 # --- 1. AUTO DATABASE & TABLE SETUP ---
 def init_db():
-    print("--- SYSTEM CHECKING DATABASE ---")
+    print("--- SYSTEM CHECKING AIVEN DATABASE ---")
+    
+    # Check if CA Certificate exists
+    if not os.path.exists(SSL_CERT):
+        print(f"❌ ERROR: '{SSL_CERT}' file nahi mili! Ise folder mein rakhein.")
+        return
+
     try:
-        # Connect to Server (Without selecting DB first)
-        conn = mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASS)
+        # Connect to Aiven
+        conn = mysql.connector.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=DB_PASS,
+            database=DB_NAME,
+            ssl_ca=SSL_CERT,     # SSL Certificate Path
+            ssl_disabled=False   # Enforce SSL
+        )
         cursor = conn.cursor()
         
-        # Create DB
-        cursor.execute(f"CREATE DATABASE IF NOT EXISTS {DB_NAME}")
-        conn.database = DB_NAME
+        # Note: Aiven par DB pehle se bana hota hai ('defaultdb'), so we directly create tables.
         
         # 1. Students Table
         cursor.execute("""
@@ -65,7 +82,10 @@ def init_db():
                 message TEXT
             )
         """)
-        cursor.execute("INSERT IGNORE INTO system_settings (id, show_results, show_fees, allow_reg, maintenance, message) VALUES (1, 1, 1, 1, 0, '')")
+        # Check if settings exist, if not insert default
+        cursor.execute("SELECT count(*) FROM system_settings")
+        if cursor.fetchone()[0] == 0:
+             cursor.execute("INSERT INTO system_settings (id, show_results, show_fees, allow_reg, maintenance, message) VALUES (1, 1, 1, 1, 0, '')")
 
         # 4. Attendance Table
         cursor.execute("""
@@ -109,19 +129,27 @@ def init_db():
         """)
 
         conn.commit()
-        print("✔ Database & All Tables Configured Successfully.")
+        print("✔ Aiven Database Connected & Tables Ready.")
         cursor.close()
         conn.close()
     except Exception as e:
-        print(f"❌ SETUP ERROR: {e}")
-        print("TIP: Make sure XAMPP/MySQL is running and password is correct.")
+        print(f"❌ AIVEN CONNECTION ERROR: {e}")
+        print("Tip: Check Host, Port, Password and make sure 'ca.pem' is in the folder.")
 
-# Helper to get connection with Error Printing
+# Helper to get connection
 def get_db():
     try:
-        return mysql.connector.connect(host=DB_HOST, user=DB_USER, password=DB_PASS, database=DB_NAME)
+        return mysql.connector.connect(
+            host=DB_HOST,
+            port=DB_PORT,
+            user=DB_USER,
+            password=DB_PASS,
+            database=DB_NAME,
+            ssl_ca=SSL_CERT,
+            ssl_disabled=False
+        )
     except Exception as e:
-        print(f"⚠️ CONNECTION FAILED: {e}")
+        print(f"⚠️ Connection Failed: {e}")
         return None
 
 # --- API ROUTES ---
@@ -131,7 +159,7 @@ def get_db():
 def apply_admission():
     data = request.json
     conn = get_db()
-    if not conn: return jsonify({"status": "error", "message": "Database disconnected"})
+    if not conn: return jsonify({"status": "error", "message": "Database disconnected. Check Server."})
     
     cursor = conn.cursor()
     try:
@@ -148,7 +176,6 @@ def apply_admission():
 @app.route('/api/admissions', methods=['GET'])
 def get_admissions():
     conn = get_db()
-    # FIX: Check if connection exists before proceeding
     if not conn: 
         print("Error: Could not connect to DB for Admissions")
         return jsonify([]) 
@@ -176,19 +203,22 @@ def delete_admission():
 @app.route('/api/config', methods=['GET'])
 def get_config():
     conn = get_db()
-    if not conn: return jsonify({"showResults": True, "showFees": True, "allowReg": True, "maintenance": False, "message": ""})
+    if not conn: return jsonify({"showResults": True, "showFees": True, "allowReg": True, "maintenance": False, "message": "DB Error"})
     
     cursor = conn.cursor(dictionary=True)
     cursor.execute("SELECT * FROM system_settings WHERE id=1")
     row = cursor.fetchone()
     conn.close()
-    return jsonify({
-        "showResults": bool(row['show_results']),
-        "showFees": bool(row['show_fees']),
-        "allowReg": bool(row['allow_reg']),
-        "maintenance": bool(row['maintenance']),
-        "message": row['message']
-    })
+    
+    if row:
+        return jsonify({
+            "showResults": bool(row['show_results']),
+            "showFees": bool(row['show_fees']),
+            "allowReg": bool(row['allow_reg']),
+            "maintenance": bool(row['maintenance']),
+            "message": row['message']
+        })
+    return jsonify({}) # Fallback
 
 @app.route('/api/config/update', methods=['POST'])
 def update_config():
@@ -208,7 +238,6 @@ def update_config():
 @app.route('/api', methods=['GET'])
 def read_data():
     conn = get_db()
-    # FIX: Safety Check
     if not conn: 
         print("Error: Could not connect to DB for Read Data")
         return jsonify([])
@@ -321,4 +350,5 @@ def get_timetable():
 
 if __name__ == '__main__':
     init_db()
+    # Note: Use port 5000 locally. On Render/Cloud, it uses Environment Port.
     app.run(debug=True, port=5000)

@@ -125,7 +125,7 @@
 
     <script>
         (function checkSystemStatus() {
-            fetch('http://localhost:5000/api/config')
+            fetch('https://kgi-api.onrender.com/api/config')
             .then(res => res.json())
             .then(config => {
                 // 1. MAINTENANCE MODE LOCK
@@ -208,7 +208,7 @@
             btnText.innerText = "VERIFYING...";
 
             // 2. FETCH DATA FROM PYTHON API (MYSQL)
-            fetch('http://localhost:5000/api?type=student')
+            fetch('https://kgi-api.onrender.com/api?type=student')
             .then(res => res.json())
             .then(data => {
                 // Find User
@@ -277,7 +277,7 @@
             };
 
             // Call API
-            fetch('http://localhost:5000/api/save', {
+            fetch('https://kgi-api.onrender.com/api/save', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updateData)
